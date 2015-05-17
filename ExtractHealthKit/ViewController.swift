@@ -46,6 +46,7 @@ class ViewController: UIViewController {
             
             if success {
                 println("Successfully request authorization from user")
+                
                 self.readDataFromHealthStore(healthStore!)
             }
             else{
@@ -59,21 +60,68 @@ class ViewController: UIViewController {
         
         let stepsCount = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierStepCount)
         
+        let calendar = NSCalendar.currentCalendar()
+        
+        let interval = NSDateComponents()
+        interval.day = 7
+        
+        // Set the anchor date to Monday at 3:00 a.m.
+        let anchorComponents =
+        calendar.components(.CalendarUnitDay | .CalendarUnitMonth |
+            .CalendarUnitYear | .CalendarUnitWeekday, fromDate: NSDate())
+        
+        let offset = (7 + anchorComponents.weekday - 2) % 7
+        anchorComponents.day -= offset
+        anchorComponents.hour = 3
+        
+        let anchorDate = calendar.dateFromComponents(anchorComponents)
+        
+        
+        let intervalComponents = NSDateComponents()
+        intervalComponents.day = 1
         //to read the data, you can just use a query
         let sortDescriptor = [NSSortDescriptor(key:HKSampleSortIdentifierStartDate, ascending: false)]
-        let queryStepsCount = HKSampleQuery(sampleType: stepsCount, predicate: nil, limit: 500, sortDescriptors: sortDescriptor) { (query, results, error) -> Void in
-            
-            if let results = results as? [HKQuantitySample]{
-                
-                self.steps = results
-                for result in results {
-                    println(result.startDate)
-                }
-                
+        let query = HKStatisticsCollectionQuery(quantityType: stepsCount, quantitySamplePredicate: nil, options: .CumulativeSum, anchorDate: anchorDate, intervalComponents: intervalComponents)
+        
+        
+        query.initialResultsHandler = {
+            query, results, error in
+
+            if error != nil {
+                // Perform proper error handling here
+                println("*** An error occurred while calculating the statistics: \(error.localizedDescription) ***")
+                abort()
             }
+            
+            let endDate = NSDate()
+            let startDate = calendar.dateByAddingUnit(NSCalendarUnit.MonthCalendarUnit, value: -1, toDate: endDate, options: nil)
+            
+            
+            results.enumerateStatisticsFromDate(startDate, toDate: endDate) {
+                statistics, stop in
+                
+                if let quantity = statistics.sumQuantity() {
+                    let date = statistics.startDate
+                    
+                    var dateFormatter = NSDateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd"
+                    let d = NSDate()
+                    let s = dateFormatter.stringFromDate(date)
+
+                    let value = quantity.doubleValueForUnit(HKUnit.countUnit())
+                    println(s)
+                    println(value)
+                }
+            }
+            
         }
-        //REMEMBER TO EXECUTE!!
-        theHealthStore.executeQuery(queryStepsCount)
+        
+
+        
+        
+        //query.in
+                //REMEMBER TO EXECUTE!!
+        theHealthStore.executeQuery(query)
     }
     
     

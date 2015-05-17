@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5FE7C84799F0F84409215B43 /* Pods_ExtractHealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99930EAF950F46E179B15BE0 /* Pods_ExtractHealthKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7F1209841B090A7A0002BE42 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1209831B090A7A0002BE42 /* AppDelegate.swift */; };
 		7F1209861B090A7A0002BE42 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1209851B090A7A0002BE42 /* ViewController.swift */; };
 		7F1209891B090A7A0002BE42 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F1209871B090A7A0002BE42 /* Main.storyboard */; };
@@ -14,6 +15,7 @@
 		7F12098E1B090A7A0002BE42 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F12098C1B090A7A0002BE42 /* LaunchScreen.xib */; };
 		7F12099A1B090A7A0002BE42 /* ExtractHealthKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1209991B090A7A0002BE42 /* ExtractHealthKitTests.swift */; };
 		7F1209A51B090AD10002BE42 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F1209A41B090AD10002BE42 /* HealthKit.framework */; };
+		CEAE577E54855187289FF976 /* Pods_ExtractHealthKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E206F5F2583A0FA42781143 /* Pods_ExtractHealthKitTests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,6 +29,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4CBB2501F1B44D8F3AA8D918 /* Pods-ExtractHealthKit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExtractHealthKit.release.xcconfig"; path = "Pods/Target Support Files/Pods-ExtractHealthKit/Pods-ExtractHealthKit.release.xcconfig"; sourceTree = "<group>"; };
+		6EA13E6F53ED6FA6DE2BBB4F /* Pods-ExtractHealthKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExtractHealthKitTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ExtractHealthKitTests/Pods-ExtractHealthKitTests.release.xcconfig"; sourceTree = "<group>"; };
 		7F12097E1B090A7A0002BE42 /* ExtractHealthKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExtractHealthKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F1209821B090A7A0002BE42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7F1209831B090A7A0002BE42 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -39,6 +43,10 @@
 		7F1209991B090A7A0002BE42 /* ExtractHealthKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtractHealthKitTests.swift; sourceTree = "<group>"; };
 		7F1209A31B090AD00002BE42 /* ExtractHealthKit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ExtractHealthKit.entitlements; sourceTree = "<group>"; };
 		7F1209A41B090AD10002BE42 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		8E206F5F2583A0FA42781143 /* Pods_ExtractHealthKitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExtractHealthKitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		99930EAF950F46E179B15BE0 /* Pods_ExtractHealthKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExtractHealthKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD37C61F67CC0FC027F2F591 /* Pods-ExtractHealthKitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExtractHealthKitTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ExtractHealthKitTests/Pods-ExtractHealthKitTests.debug.xcconfig"; sourceTree = "<group>"; };
+		CC94C9D53B1ABF47E16EF7EE /* Pods-ExtractHealthKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExtractHealthKit.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ExtractHealthKit/Pods-ExtractHealthKit.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +55,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F1209A51B090AD10002BE42 /* HealthKit.framework in Frameworks */,
+				5FE7C84799F0F84409215B43 /* Pods_ExtractHealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,12 +63,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEAE577E54855187289FF976 /* Pods_ExtractHealthKitTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		63EC498C9E614784F5924551 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				CC94C9D53B1ABF47E16EF7EE /* Pods-ExtractHealthKit.debug.xcconfig */,
+				4CBB2501F1B44D8F3AA8D918 /* Pods-ExtractHealthKit.release.xcconfig */,
+				BD37C61F67CC0FC027F2F591 /* Pods-ExtractHealthKitTests.debug.xcconfig */,
+				6EA13E6F53ED6FA6DE2BBB4F /* Pods-ExtractHealthKitTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		7F1209751B090A7A0002BE42 = {
 			isa = PBXGroup;
 			children = (
@@ -67,6 +88,8 @@
 				7F1209801B090A7A0002BE42 /* ExtractHealthKit */,
 				7F1209961B090A7A0002BE42 /* ExtractHealthKitTests */,
 				7F12097F1B090A7A0002BE42 /* Products */,
+				63EC498C9E614784F5924551 /* Pods */,
+				ADC8F91BEC273D1870B6F4E0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -118,6 +141,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		ADC8F91BEC273D1870B6F4E0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				99930EAF950F46E179B15BE0 /* Pods_ExtractHealthKit.framework */,
+				8E206F5F2583A0FA42781143 /* Pods_ExtractHealthKitTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -125,9 +157,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7F12099D1B090A7A0002BE42 /* Build configuration list for PBXNativeTarget "ExtractHealthKit" */;
 			buildPhases = (
+				E06F61B11383277E2CAE269E /* Check Pods Manifest.lock */,
 				7F12097A1B090A7A0002BE42 /* Sources */,
 				7F12097B1B090A7A0002BE42 /* Frameworks */,
 				7F12097C1B090A7A0002BE42 /* Resources */,
+				8A2A6514E5A2A124D907F7F9 /* Embed Pods Frameworks */,
+				0B5D8317225CE52C42B8679B /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -142,9 +177,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7F1209A01B090A7A0002BE42 /* Build configuration list for PBXNativeTarget "ExtractHealthKitTests" */;
 			buildPhases = (
+				9B283E74264727D28B832EB9 /* Check Pods Manifest.lock */,
 				7F12098F1B090A7A0002BE42 /* Sources */,
 				7F1209901B090A7A0002BE42 /* Frameworks */,
 				7F1209911B090A7A0002BE42 /* Resources */,
+				CB764AA391E50EDA770E4960 /* Embed Pods Frameworks */,
+				4986872287F5B69BF21DD999 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -218,6 +256,99 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0B5D8317225CE52C42B8679B /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExtractHealthKit/Pods-ExtractHealthKit-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4986872287F5B69BF21DD999 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExtractHealthKitTests/Pods-ExtractHealthKitTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8A2A6514E5A2A124D907F7F9 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExtractHealthKit/Pods-ExtractHealthKit-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9B283E74264727D28B832EB9 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		CB764AA391E50EDA770E4960 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ExtractHealthKitTests/Pods-ExtractHealthKitTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E06F61B11383277E2CAE269E /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		7F12097A1B090A7A0002BE42 /* Sources */ = {
@@ -352,6 +483,7 @@
 		};
 		7F12099E1B090A7A0002BE42 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC94C9D53B1ABF47E16EF7EE /* Pods-ExtractHealthKit.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ExtractHealthKit/ExtractHealthKit.entitlements;
@@ -366,6 +498,7 @@
 		};
 		7F12099F1B090A7A0002BE42 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4CBB2501F1B44D8F3AA8D918 /* Pods-ExtractHealthKit.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ExtractHealthKit/ExtractHealthKit.entitlements;
@@ -380,6 +513,7 @@
 		};
 		7F1209A11B090A7A0002BE42 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BD37C61F67CC0FC027F2F591 /* Pods-ExtractHealthKitTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -399,6 +533,7 @@
 		};
 		7F1209A21B090A7A0002BE42 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6EA13E6F53ED6FA6DE2BBB4F /* Pods-ExtractHealthKitTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -431,6 +566,7 @@
 				7F12099F1B090A7A0002BE42 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7F1209A01B090A7A0002BE42 /* Build configuration list for PBXNativeTarget "ExtractHealthKitTests" */ = {
 			isa = XCConfigurationList;
@@ -439,6 +575,7 @@
 				7F1209A21B090A7A0002BE42 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
