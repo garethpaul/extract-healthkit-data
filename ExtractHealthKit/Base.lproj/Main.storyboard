@@ -1,25 +1,72 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6211" systemVersion="14A298i" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="j7e-6C-mdg">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6204"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
-        <scene sceneID="tne-QT-ifu">
+        <!--Navigation Controller-->
+        <scene sceneID="BcR-pY-bv4">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController id="j7e-6C-mdg" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="MdV-1h-xEU">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="Y6V-eE-Ys7" kind="relationship" relationship="rootViewController" id="vO2-MU-dTo"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lJ7-zz-91B" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="312" y="-149"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="N5o-7L-SU5">
+            <objects>
+                <viewController id="Y6V-eE-Ys7" customClass="ViewController" customModule="ExtractHealthKit" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
-                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                        <viewControllerLayoutGuide type="top" id="Ooj-Bz-fhS"/>
+                        <viewControllerLayoutGuide type="bottom" id="qvL-Ln-szc"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                    <view key="view" contentMode="scaleToFill" id="XCb-nN-9a4">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="92" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="WIS-ah-2Cg">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="Y6V-eE-Ys7" id="cU2-SI-ONM"/>
+                                    <outlet property="delegate" destination="Y6V-eE-Ys7" id="ACU-5K-oPh"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="WIS-ah-2Cg" firstAttribute="leading" secondItem="XCb-nN-9a4" secondAttribute="leading" id="BMW-S5-CMm"/>
+                            <constraint firstItem="WIS-ah-2Cg" firstAttribute="top" secondItem="XCb-nN-9a4" secondAttribute="top" id="SXd-Fj-GDY"/>
+                            <constraint firstItem="qvL-Ln-szc" firstAttribute="top" secondItem="WIS-ah-2Cg" secondAttribute="bottom" id="W2c-dr-Qyb"/>
+                            <constraint firstAttribute="trailing" secondItem="WIS-ah-2Cg" secondAttribute="trailing" id="WfC-tw-UP5"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="NMW-PA-6pD">
+                        <barButtonItem key="rightBarButtonItem" image="export" id="jHy-sp-6LY">
+                            <connections>
+                                <action selector="exportData:" destination="Y6V-eE-Ys7" id="Qeh-dB-hiZ"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="tableView" destination="WIS-ah-2Cg" id="fhZ-7v-08w"/>
+                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tjJ-XV-v4P" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="963" y="-160"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="export" width="32" height="30"/>
+    </resources>
+    <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
 </document>

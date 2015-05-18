@@ -15,6 +15,13 @@
 		7F12098E1B090A7A0002BE42 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F12098C1B090A7A0002BE42 /* LaunchScreen.xib */; };
 		7F12099A1B090A7A0002BE42 /* ExtractHealthKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1209991B090A7A0002BE42 /* ExtractHealthKitTests.swift */; };
 		7F1209A51B090AD10002BE42 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F1209A41B090AD10002BE42 /* HealthKit.framework */; };
+		7FFBDB071B0941AA00EC0873 /* BasicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7FFBDB061B0941AA00EC0873 /* BasicCell.xib */; };
+		7FFBDB091B09425100EC0873 /* BasicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFBDB081B09425100EC0873 /* BasicCell.swift */; };
+		7FFBDB0B1B09592000EC0873 /* Steps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFBDB0A1B09592000EC0873 /* Steps.swift */; };
+		7FFBDB0E1B09662900EC0873 /* Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFBDB0D1B09662900EC0873 /* Hex.swift */; };
+		7FFBDB1B1B09709500EC0873 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFBDB1A1B09709500EC0873 /* API.swift */; };
+		7FFBDB281B0971AF00EC0873 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FFBDB271B0971AF00EC0873 /* Alamofire.framework */; };
+		7FFBDB2A1B0971B500EC0873 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FFBDB291B0971B500EC0873 /* SwiftyJSON.framework */; };
 		CEAE577E54855187289FF976 /* Pods_ExtractHealthKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E206F5F2583A0FA42781143 /* Pods_ExtractHealthKitTests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -43,6 +50,16 @@
 		7F1209991B090A7A0002BE42 /* ExtractHealthKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtractHealthKitTests.swift; sourceTree = "<group>"; };
 		7F1209A31B090AD00002BE42 /* ExtractHealthKit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ExtractHealthKit.entitlements; sourceTree = "<group>"; };
 		7F1209A41B090AD10002BE42 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		7FFBDB061B0941AA00EC0873 /* BasicCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BasicCell.xib; sourceTree = "<group>"; };
+		7FFBDB081B09425100EC0873 /* BasicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicCell.swift; sourceTree = "<group>"; };
+		7FFBDB0A1B09592000EC0873 /* Steps.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Steps.swift; sourceTree = "<group>"; };
+		7FFBDB0D1B09662900EC0873 /* Hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hex.swift; sourceTree = "<group>"; };
+		7FFBDB1A1B09709500EC0873 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		7FFBDB1C1B0970E400EC0873 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = "Pods/../build/Debug-iphoneos/Pods-ExtractHealthKit/Alamofire.framework"; sourceTree = "<group>"; };
+		7FFBDB1E1B0970FD00EC0873 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = "Pods/../build/Debug-iphoneos/Pods-ExtractHealthKit/Alamofire.framework"; sourceTree = "<group>"; };
+		7FFBDB201B09710300EC0873 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = "Pods/../build/Debug-iphoneos/Pods-ExtractHealthKit/SwiftyJSON.framework"; sourceTree = "<group>"; };
+		7FFBDB271B0971AF00EC0873 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = "Pods/../build/Debug-iphoneos/Pods-ExtractHealthKit/Alamofire.framework"; sourceTree = "<group>"; };
+		7FFBDB291B0971B500EC0873 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = "Pods/../build/Debug-iphoneos/Pods-ExtractHealthKit/SwiftyJSON.framework"; sourceTree = "<group>"; };
 		8E206F5F2583A0FA42781143 /* Pods_ExtractHealthKitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExtractHealthKitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		99930EAF950F46E179B15BE0 /* Pods_ExtractHealthKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ExtractHealthKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD37C61F67CC0FC027F2F591 /* Pods-ExtractHealthKitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExtractHealthKitTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ExtractHealthKitTests/Pods-ExtractHealthKitTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -54,6 +71,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FFBDB2A1B0971B500EC0873 /* SwiftyJSON.framework in Frameworks */,
+				7FFBDB281B0971AF00EC0873 /* Alamofire.framework in Frameworks */,
 				7F1209A51B090AD10002BE42 /* HealthKit.framework in Frameworks */,
 				5FE7C84799F0F84409215B43 /* Pods_ExtractHealthKit.framework in Frameworks */,
 			);
@@ -107,7 +126,10 @@
 			children = (
 				7F1209A31B090AD00002BE42 /* ExtractHealthKit.entitlements */,
 				7F1209831B090A7A0002BE42 /* AppDelegate.swift */,
-				7F1209851B090A7A0002BE42 /* ViewController.swift */,
+				7FFBDB101B09663700EC0873 /* Controllers */,
+				7FFBDB0F1B09663100EC0873 /* Models */,
+				7FFBDB0C1B09661D00EC0873 /* Functions */,
+				7FFBDB111B09664900EC0873 /* Views */,
 				7F1209871B090A7A0002BE42 /* Main.storyboard */,
 				7F12098A1B090A7A0002BE42 /* Images.xcassets */,
 				7F12098C1B090A7A0002BE42 /* LaunchScreen.xib */,
@@ -141,9 +163,48 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		7FFBDB0C1B09661D00EC0873 /* Functions */ = {
+			isa = PBXGroup;
+			children = (
+				7FFBDB0D1B09662900EC0873 /* Hex.swift */,
+				7FFBDB1A1B09709500EC0873 /* API.swift */,
+			);
+			name = Functions;
+			sourceTree = "<group>";
+		};
+		7FFBDB0F1B09663100EC0873 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7FFBDB0A1B09592000EC0873 /* Steps.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		7FFBDB101B09663700EC0873 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				7F1209851B090A7A0002BE42 /* ViewController.swift */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		7FFBDB111B09664900EC0873 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				7FFBDB061B0941AA00EC0873 /* BasicCell.xib */,
+				7FFBDB081B09425100EC0873 /* BasicCell.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		ADC8F91BEC273D1870B6F4E0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7FFBDB291B0971B500EC0873 /* SwiftyJSON.framework */,
+				7FFBDB271B0971AF00EC0873 /* Alamofire.framework */,
+				7FFBDB201B09710300EC0873 /* SwiftyJSON.framework */,
+				7FFBDB1E1B0970FD00EC0873 /* Alamofire.framework */,
+				7FFBDB1C1B0970E400EC0873 /* Alamofire.framework */,
 				99930EAF950F46E179B15BE0 /* Pods_ExtractHealthKit.framework */,
 				8E206F5F2583A0FA42781143 /* Pods_ExtractHealthKitTests.framework */,
 			);
@@ -242,6 +303,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FFBDB071B0941AA00EC0873 /* BasicCell.xib in Resources */,
 				7F1209891B090A7A0002BE42 /* Main.storyboard in Resources */,
 				7F12098E1B090A7A0002BE42 /* LaunchScreen.xib in Resources */,
 				7F12098B1B090A7A0002BE42 /* Images.xcassets in Resources */,
@@ -356,6 +418,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F1209861B090A7A0002BE42 /* ViewController.swift in Sources */,
+				7FFBDB0E1B09662900EC0873 /* Hex.swift in Sources */,
+				7FFBDB0B1B09592000EC0873 /* Steps.swift in Sources */,
+				7FFBDB091B09425100EC0873 /* BasicCell.swift in Sources */,
+				7FFBDB1B1B09709500EC0873 /* API.swift in Sources */,
 				7F1209841B090A7A0002BE42 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -489,6 +555,10 @@
 				CODE_SIGN_ENTITLEMENTS = ExtractHealthKit/ExtractHealthKit.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos/Pods-ExtractHealthKit",
+				);
 				INFOPLIST_FILE = ExtractHealthKit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -504,6 +574,10 @@
 				CODE_SIGN_ENTITLEMENTS = ExtractHealthKit/ExtractHealthKit.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos/Pods-ExtractHealthKit",
+				);
 				INFOPLIST_FILE = ExtractHealthKit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
