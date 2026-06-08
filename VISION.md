@@ -22,16 +22,27 @@ Priority:
 - Avoid committing endpoint secrets, signing material, or health data
 - Keep the CocoaPods workspace and iOS 8-era dependency assumptions clear
 
+Current baseline:
+
+- `scripts/check-baseline.sh` validates privacy-sensitive source invariants,
+  HealthKit plist and entitlement metadata, locked CocoaPods versions, and Xcode
+  project settings.
+- The app requests read-only HealthKit step-count access.
+- Export uses `HealthKitExportEndpoint` from app metadata, requires HTTPS, and
+  does not log the step payload.
+- HealthKit query errors no longer abort the app.
+
 Next priorities:
 
-- Add README setup, permissions, and verification instructions
-- Move the export endpoint into documented local configuration
+- Verify the privacy baseline on a macOS/Xcode machine with a HealthKit-capable
+  device
 - Modernize Swift, Alamofire, SwiftyJSON, and HealthKit APIs in a dedicated pass
 - Add tests or manual verification notes for authorization and export behavior
 
 Contribution rules:
 
 - One PR = one focused HealthKit, export, build, or documentation change.
+- Run `scripts/check-baseline.sh` before pushing HealthKit/export changes.
 - Verify HealthKit behavior on a capable device when changing data access.
 - Keep exported payload shape documented.
 - Do not mix toolchain migration with privacy-sensitive behavior changes.

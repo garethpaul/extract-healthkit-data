@@ -9,15 +9,40 @@
 import Foundation
 import Alamofire
 
-func postRequest(payload: AnyObject){
-    
-    // Send HTTP request to URL
-    let url = NSURL(string: "https://requestlabs.appspot.com/api/steps")
-    let request = NSMutableURLRequest(URL: url!)
-    request.HTTPMethod = "POST"
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    var error: NSError?
-    request.HTTPBody = NSJSONSerialization.dataWithJSONObject(payload, options: nil, error: &error)
-    Alamofire.request(request)
+let HealthKitExportEndpointKey = "HealthKitExportEndpoint"
 
+func exportEndpointURL() -> NSURL? {
+    let endpoint = NSBundle.mainBundle().objectForInfoDictionaryKey(HealthKitExportEndpointKey) as? String
+    let trimmedEndpoint = endpoint?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+
+    if let configuredEndpoint = trimmedEndpoint {
+        if !configuredEndpoint.isEmpty {
+            let url = NSURL(string: configuredEndpoint)
+            if url?.scheme != "https" {
+                return nil
+            }
+            return url
+        }
+    }
+
+    return nil
+}
+
+func postRequest(payload: AnyObject) -> Bool {
+
+    if let url = exportEndpointURL() {
+        let request = NSMutableURLRequest(URL: url)
+        request.HTTPMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        var error: NSError?
+        let body = NSJSONSerialization.dataWithJSONObject(payload, options: nil, error: &error)
+        if error != nil || body == nil {
+            return false
+        }
+        request.HTTPBody = body
+        Alamofire.request(request)
+        return true
+    }
+
+    return false
 }

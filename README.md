@@ -5,13 +5,18 @@
 
 ## Overview
 
-`garethpaul/extract-healthkit-data` is a Apple platform application or Objective-C/Swift sample. Extract data from HealthKit
+`garethpaul/extract-healthkit-data` is a legacy Swift iOS sample that reads
+step-count data from HealthKit, displays recent daily totals, and can export
+those values to a configured HTTPS endpoint.
 
-This README is based on the checked-in source, manifests, scripts, and repository metadata on the `master` branch. The project language mix found during review was: Swift (11).
+HealthKit step data is sensitive. The checked-in baseline requests read-only
+step-count access and keeps the export endpoint empty until configured locally.
 
 ## Repository Contents
 
 - `Podfile` - Apple platform dependency metadata
+- `CHANGES.md` - maintenance history
+- `Makefile` - local verification entry points
 - `ExtractHealthKit` - source or example code
 - `ExtractHealthKit.xcodeproj` - Xcode project file
 - `ExtractHealthKitTests` - source or example code
@@ -33,6 +38,8 @@ Additional scan context:
 - Git
 - macOS with Xcode for building Apple platform projects
 - CocoaPods if dependencies need to be installed
+- Python 3 for the static baseline script
+- `make`
 
 ### Setup
 
@@ -46,17 +53,36 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 ## Running or Using the Project
 
-- Open `ExtractHealthKit.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
+- Open `ExtractHealthKit.xcworkspace` after `pod install`, choose the app
+  scheme, and run it on a HealthKit-capable device.
+- Configure `HealthKitExportEndpoint` in local app metadata with an HTTPS URL
+  before using export. The committed value is intentionally empty.
+- The app requests read-only step-count access and only exports after the user
+  confirms the export alert.
 
 ## Testing and Verification
 
-- Xcode's test action or `xcodebuild test` with the appropriate scheme and destination
+Run the static maintenance gate:
+
+```bash
+make check
+```
+
+`make check` validates privacy-sensitive source invariants, HealthKit plist and
+entitlement metadata, Podfile lock versions, and Xcode project settings. When
+`xcodebuild` is available, it also checks that Xcode can parse the project.
+
+For full verification, run the app on a HealthKit-capable device with test data
+you control.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 
 ## Configuration and Secrets
 
-- Detected references to Parse. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
+- Keep endpoint URLs, API keys, OAuth credentials, tokens, signing material, and
+  account-specific values in local configuration only.
+- `HealthKitExportEndpoint` is the local HTTPS export endpoint setting. Do not
+  commit a private endpoint value.
 
 ## Security and Privacy Notes
 
@@ -65,12 +91,16 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching network requests, sockets, or service endpoints; examples from the scan include ExtractHealthKit/API.swift, ExtractHealthKit/Alamofire.swift, ExtractHealthKit/Info.plist, ExtractHealthKit/Request.swift, and 3 more.
 - Review changes touching mobile permissions or privacy-sensitive device data; examples from the scan include ExtractHealthKit/Alamofire.swift, ExtractHealthKit/Info.plist, ExtractHealthKit/Request.swift, ExtractHealthKit/SwiftyJSON.swift, and 1 more.
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include ExtractHealthKit/API.swift, ExtractHealthKit/Alamofire.swift, ExtractHealthKit/Info.plist, ExtractHealthKit/SwiftyJSON.swift, and 2 more.
+- Do not log, commit, or fixture real HealthKit records. Use synthetic data for
+  verification notes and tests.
 
 ## Maintenance Notes
 
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
+- See `docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md` for the
+  current privacy baseline.
 
 ## Contributing
 

@@ -91,17 +91,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         //the sample code below can be used to get any of the HKQuantiyType
         let stepCount = HKQuantityType.quantityTypeForIdentifier(HKQuantityTypeIdentifierStepCount)
         
-        //we can read and write the data that is made available to us by the users
-        //however choose wisely what data we want from the user, requesting too many might be intimidating
-        let dataToWrite = NSSet(object: stepCount)
+        // Request only the data this sample reads.
         let dataToRead = NSSet(object: stepCount)
         
-        healthStore?.requestAuthorizationToShareTypes(dataToWrite as Set<NSObject>, readTypes: dataToRead as Set<NSObject>, completion: { (success, error) -> Void in
+        healthStore?.requestAuthorizationToShareTypes(nil, readTypes: dataToRead as Set<NSObject>, completion: { (success, error) -> Void in
             
             if success {
                 println("Successfully request authorization from user")
                 
-                self.readDataFromHealthStore(healthStore!)
+                if let store = healthStore {
+                    self.readDataFromHealthStore(store)
+                }
             }
             else{
                 println("Unsuccessful. \(error.description)")
@@ -135,7 +135,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             if error != nil {
                 // Perform proper error handling here
                 println("*** An error occurred while calculating the statistics: \(error.localizedDescription) ***")
-                abort()
+                return
             }
             
             let endDate = NSDate()
@@ -164,7 +164,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @IBAction func exportData(sender: AnyObject) {
         
-        var exportAlert = UIAlertController(title: "Export Data", message: "All data from the last 30 days will be exported.", preferredStyle: UIAlertControllerStyle.Alert)
+        var exportAlert = UIAlertController(title: "Export Data", message: "Step-count data from the last 30 days will be exported to the configured HTTPS endpoint.", preferredStyle: UIAlertControllerStyle.Alert)
         
         exportAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
             // Ok
@@ -176,8 +176,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
             
             // Construct HTTP Request
-            println(json)
-            postRequest(json)
+            if !postRequest(json) {
+                println("HealthKit export endpoint is not configured.")
+            }
             
         }))
         
