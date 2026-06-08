@@ -46,3 +46,6 @@ Remote endpoint changes must use HTTPS and documented configuration.
 - Background health-data export without clear user action
 - Broad Swift migration bundled with behavior changes
 - Sample data copied from real HealthKit records
+
+This list is a roadmap guardrail, not a permanent rule.
+Strong user demand and strong technical rationale can change it.
