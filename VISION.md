@@ -35,6 +35,11 @@ Contribution rules:
 
 ## Security And Privacy
 
+Canonical security policy and reporting:
+
+- [`SECURITY.md`](SECURITY.md)
+
+
 HealthKit step data is sensitive. The app should request only the data it needs,
 make export behavior explicit, and avoid logging or committing health data.
 
