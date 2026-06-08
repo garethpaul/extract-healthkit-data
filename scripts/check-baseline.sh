@@ -59,7 +59,7 @@ fi
 
 if ! grep -Fq "HealthKitExportEndpointKey" "$API" ||
   ! grep -Fq "objectForInfoDictionaryKey" "$API" ||
-  ! grep -Fq 'url?.scheme == "https"' "$API" ||
+  ! grep -Fq 'url?.scheme != "https"' "$API" ||
   ! grep -Fq "stringByTrimmingCharactersInSet" "$API" ||
   ! grep -Fq "return false" "$API"; then
   printf '%s\n' "API.swift must keep endpoint lookup, HTTPS validation, and failed-send return behavior." >&2
