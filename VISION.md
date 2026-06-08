@@ -40,7 +40,7 @@ make export behavior explicit, and avoid logging or committing health data.
 
 Remote endpoint changes must use HTTPS and documented configuration.
 
-## What We Will Not Merge For Now
+## What We Will Not Merge (For Now)
 
 - Hardcoded private endpoints or credentials
 - Background health-data export without clear user action
