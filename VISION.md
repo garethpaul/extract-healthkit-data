@@ -1,5 +1,8 @@
 ## Extract HealthKit Data Vision
 
+This document explains the current state and direction of the project.
+Project overview and developer docs: [`README.md`](README.md)
+
 Extract HealthKit Data is a Swift iOS sample that reads step-count data from
 HealthKit, displays recent daily values, and can export those values to a remote
 endpoint.
