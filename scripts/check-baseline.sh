@@ -15,6 +15,7 @@ URL_PARTS_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-query-fragmen
 SIGNING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-signing-artifact-guard.md"
 JSON_PAYLOAD_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-json-payload-validation.md"
 ERROR_LOGGING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-error-logging-guard.md"
+EXPORT_ROW_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-row-validation.md"
 
 require_file() {
   path=$1
@@ -45,6 +46,7 @@ for path in \
   "docs/plans/2026-06-09-healthkit-signing-artifact-guard.md" \
   "docs/plans/2026-06-09-healthkit-json-payload-validation.md" \
   "docs/plans/2026-06-09-healthkit-error-logging-guard.md" \
+  "docs/plans/2026-06-09-healthkit-export-row-validation.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -55,6 +57,7 @@ if ! grep -Fq "make check" "$README" ||
   ! grep -Fq "includes a host" "$README" ||
   ! grep -Fq "query strings, or fragments" "$README" ||
   ! grep -Fq "valid JSON objects" "$README" ||
+  ! grep -Fq "valid date/value fields" "$README" ||
   ! grep -Fq "raw HealthKit error descriptions" "$README" ||
   ! grep -Fq "HealthKit step data is sensitive" "$README"; then
   printf '%s\n' "README must document verification, export configuration, and HealthKit privacy posture." >&2
@@ -66,6 +69,7 @@ if ! grep -Fq "scripts/check-baseline.sh" "$VISION" ||
   ! grep -Fq "HTTPS URL" "$VISION" ||
   ! grep -Fq "query string, or" "$VISION" ||
   ! grep -Fq "valid JSON objects" "$VISION" ||
+  ! grep -Fq "valid date/value fields" "$VISION" ||
   ! grep -Fq "HealthKit failure logging" "$VISION" ||
   ! grep -Fq "HealthKitExportEndpoint" "$VISION"; then
   printf '%s\n' "VISION must include the baseline command, read-only HealthKit scope, and endpoint configuration." >&2
@@ -83,6 +87,11 @@ fi
 
 if ! grep -Fq "raw HealthKit error" "$ROOT_DIR/SECURITY.md"; then
   printf '%s\n' "SECURITY must document HealthKit error logging boundaries." >&2
+  exit 1
+fi
+
+if ! grep -Fq "valid date/value fields" "$ROOT_DIR/SECURITY.md"; then
+  printf '%s\n' "SECURITY must document HealthKit export row validation." >&2
   exit 1
 fi
 
@@ -105,9 +114,13 @@ fi
 if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "readTypes: dataToRead" "$VIEW" ||
   ! grep -Fq "func exportPayload(steps: [Steps]) -> [AnyObject]" "$VIEW" ||
+  ! grep -Fq "func validExportField(value: String) -> String?" "$VIEW" ||
+  ! grep -Fq "stringByTrimmingCharactersInSet" "$VIEW" ||
   ! grep -Fq "self.outData.isEmpty" "$VIEW" ||
   ! grep -Fq "No HealthKit step data available to export." "$VIEW" ||
   ! grep -Fq "let json = exportPayload(self.outData)" "$VIEW" ||
+  ! grep -Fq "json.isEmpty" "$VIEW" ||
+  ! grep -Fq "No valid HealthKit step data available to export." "$VIEW" ||
   ! grep -Fq "HealthKit authorization was not granted." "$VIEW" ||
   ! grep -Fq "HealthKit statistics query failed." "$VIEW" ||
   ! grep -Fq "HealthKit export endpoint is not configured." "$VIEW"; then
@@ -143,9 +156,10 @@ from pathlib import Path
 source = Path(sys.argv[1]).read_text(encoding="utf-8")
 empty_guard = source.find("self.outData.isEmpty")
 payload = source.find("let json = exportPayload(self.outData)")
+filtered_guard = source.find("json.isEmpty")
 post = source.find("postRequest(json)")
-if -1 in (empty_guard, payload, post) or not (empty_guard < payload < post):
-    print("HealthKit export must guard empty data before building and posting the payload.", file=sys.stderr)
+if -1 in (empty_guard, payload, filtered_guard, post) or not (empty_guard < payload < filtered_guard < post):
+    print("HealthKit export must guard empty data before building, filter invalid rows, then post the payload.", file=sys.stderr)
     raise SystemExit(1)
 PY
 
@@ -227,8 +241,18 @@ if ! grep -Fq "status: completed" "$ERROR_LOGGING_PLAN"; then
   exit 1
 fi
 
+if ! grep -Fq "status: completed" "$EXPORT_ROW_PLAN"; then
+  printf '%s\n' "HealthKit export row validation plan must be marked completed." >&2
+  exit 1
+fi
+
 if ! grep -Fq "make check" "$ERROR_LOGGING_PLAN"; then
   printf '%s\n' "HealthKit error logging guard plan must record make check verification." >&2
+  exit 1
+fi
+
+if ! grep -Fq "make check" "$EXPORT_ROW_PLAN"; then
+  printf '%s\n' "HealthKit export row validation plan must record make check verification." >&2
   exit 1
 fi
 

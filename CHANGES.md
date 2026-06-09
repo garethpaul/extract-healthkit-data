@@ -2,6 +2,7 @@
 
 ## 2026-06-09
 
+- Filtered HealthKit export rows to valid date/value fields before POST.
 - Replaced raw HealthKit authorization/query error logging with generic failure
   messages.
 - Rejected non-JSON-serializable HealthKit export payloads before building the

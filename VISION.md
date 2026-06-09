@@ -33,6 +33,8 @@ Current baseline:
   fragment, and does not log the step payload.
 - Export builds an explicit `date`/`value` payload and skips the network request
   when no step rows are available.
+- Export payload construction keeps only rows with valid date/value fields and
+  skips the network request if filtering leaves no rows.
 - Export serialization only runs for Foundation-valid JSON objects.
 - HealthKit failure logging uses generic messages instead of raw HealthKit
   error descriptions.

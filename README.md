@@ -63,6 +63,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   confirms the export alert.
 - Export payloads contain `date` and `value` fields for collected step rows;
   no network request is made when there are no step rows to export.
+- Export payload construction keeps only rows with valid date/value fields and
+  skips the network request if filtering leaves no rows.
 - Export requests are only serialized when the payload is one of Foundation's
   valid JSON objects.
 - HealthKit authorization and query failures use generic log messages instead
@@ -125,6 +127,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   JSON payload validation guard.
 - See `docs/plans/2026-06-09-healthkit-error-logging-guard.md` for the
   HealthKit error logging guard.
+- See `docs/plans/2026-06-09-healthkit-export-row-validation.md` for export
+  row validation before POST.
 
 ## Contributing
 

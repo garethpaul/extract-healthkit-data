@@ -40,6 +40,8 @@ Helpful reports include:
   handling.
 - HealthKit authorization and query failures should not log raw HealthKit error
   descriptions.
+- HealthKit export payloads should keep only rows with valid date/value fields
+  and skip network handling if filtering leaves no rows.
 
 ## Mobile Privacy Notes
 

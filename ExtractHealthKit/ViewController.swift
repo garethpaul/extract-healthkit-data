@@ -9,10 +9,22 @@
 import UIKit
 import HealthKit
 
+func validExportField(value: String) -> String? {
+    let trimmedValue = value.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+    if trimmedValue.isEmpty {
+        return nil
+    }
+    return trimmedValue
+}
+
 func exportPayload(steps: [Steps]) -> [AnyObject] {
     var json = [AnyObject]()
     for item in steps {
-        json.append(["date": item.date, "value": item.value])
+        if let date = validExportField(item.date) {
+            if let value = validExportField(item.value) {
+                json.append(["date": date, "value": value])
+            }
+        }
     }
     return json
 }
@@ -183,6 +195,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
 
             let json = exportPayload(self.outData)
+            if json.isEmpty {
+                println("No valid HealthKit step data available to export.")
+                return
+            }
 
             // Construct HTTP Request
             if !postRequest(json) {
