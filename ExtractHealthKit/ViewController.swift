@@ -9,6 +9,14 @@
 import UIKit
 import HealthKit
 
+func exportPayload(steps: [Steps]) -> [AnyObject] {
+    var json = [AnyObject]()
+    for item in steps {
+        json.append(["date": item.date, "value": item.value])
+    }
+    return json
+}
+
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet var tableView: UITableView!
@@ -168,13 +176,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         exportAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
             // Ok
-            
-            // Send HTTP Request with Data
-            var json = [AnyObject]()
-            for item in self.outData {
-                json.append(["date": item.date, "value": item.value])
+
+            if self.outData.isEmpty {
+                println("No HealthKit step data available to export.")
+                return
             }
-            
+
+            let json = exportPayload(self.outData)
+
             // Construct HTTP Request
             if !postRequest(json) {
                 println("HealthKit export endpoint is not configured.")

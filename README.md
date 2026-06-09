@@ -60,6 +60,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   empty.
 - The app requests read-only step-count access and only exports after the user
   confirms the export alert.
+- Export payloads contain `date` and `value` fields for collected step rows;
+  no network request is made when there are no step rows to export.
 
 ## Testing and Verification
 
@@ -102,6 +104,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md` for the
   current privacy baseline.
+- See `docs/plans/2026-06-09-healthkit-empty-export-guard.md` for the
+  empty-export guard and payload-shape plan.
 
 ## Contributing
 

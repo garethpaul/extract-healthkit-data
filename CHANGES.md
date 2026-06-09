@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-09
+
+- Extracted HealthKit export payload construction into a dedicated helper.
+- Skipped export network requests when no step rows are available.
+- Added a static baseline guard and plan for the empty-export behavior.
+
 ## 2026-06-08
 
 - Moved the HealthKit export endpoint to the `HealthKitExportEndpoint` app

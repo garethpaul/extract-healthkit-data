@@ -30,6 +30,8 @@ Current baseline:
 - The app requests read-only HealthKit step-count access.
 - Export uses `HealthKitExportEndpoint` from app metadata, requires an HTTPS URL
   with a host, and does not log the step payload.
+- Export builds an explicit `date`/`value` payload and skips the network request
+  when no step rows are available.
 - HealthKit query errors no longer abort the app.
 
 Next priorities:
@@ -45,6 +47,7 @@ Contribution rules:
 - Run `scripts/check-baseline.sh` before pushing HealthKit/export changes.
 - Verify HealthKit behavior on a capable device when changing data access.
 - Keep exported payload shape documented.
+- Keep empty or failed data reads from triggering export network calls.
 - Do not mix toolchain migration with privacy-sensitive behavior changes.
 
 ## Security And Privacy

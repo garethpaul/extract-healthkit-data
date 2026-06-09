@@ -9,6 +9,7 @@ API="$ROOT_DIR/ExtractHealthKit/API.swift"
 VIEW="$ROOT_DIR/ExtractHealthKit/ViewController.swift"
 PLAN="$ROOT_DIR/docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"
 ENDPOINT_PLAN="$ROOT_DIR/docs/plans/2026-06-08-healthkit-endpoint-host-validation.md"
+EMPTY_EXPORT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-empty-export-guard.md"
 
 require_file() {
   path=$1
@@ -33,6 +34,7 @@ for path in \
   "ExtractHealthKit/API.swift" \
   "ExtractHealthKit/ViewController.swift" \
   "ExtractHealthKit/Steps.swift" \
+  "docs/plans/2026-06-09-healthkit-empty-export-guard.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -74,10 +76,27 @@ fi
 
 if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "readTypes: dataToRead" "$VIEW" ||
+  ! grep -Fq "func exportPayload(steps: [Steps]) -> [AnyObject]" "$VIEW" ||
+  ! grep -Fq "self.outData.isEmpty" "$VIEW" ||
+  ! grep -Fq "No HealthKit step data available to export." "$VIEW" ||
+  ! grep -Fq "let json = exportPayload(self.outData)" "$VIEW" ||
   ! grep -Fq "HealthKit export endpoint is not configured." "$VIEW"; then
   printf '%s\n' "ViewController must keep read-only HealthKit authorization and explicit export failure handling." >&2
   exit 1
 fi
+
+python3 - "$VIEW" <<'PY'
+import sys
+from pathlib import Path
+
+source = Path(sys.argv[1]).read_text(encoding="utf-8")
+empty_guard = source.find("self.outData.isEmpty")
+payload = source.find("let json = exportPayload(self.outData)")
+post = source.find("postRequest(json)")
+if -1 in (empty_guard, payload, post) or not (empty_guard < payload < post):
+    print("HealthKit export must guard empty data before building and posting the payload.", file=sys.stderr)
+    raise SystemExit(1)
+PY
 
 if ! grep -Fq "com.apple.developer.healthkit" "$ROOT_DIR/ExtractHealthKit/ExtractHealthKit.entitlements" ||
   ! grep -Fq "IPHONEOS_DEPLOYMENT_TARGET = 8.3;" "$PROJECT" ||
@@ -124,6 +143,11 @@ fi
 
 if ! grep -Fq "status: completed" "$ENDPOINT_PLAN"; then
   printf '%s\n' "Endpoint host validation plan must be marked completed." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$EMPTY_EXPORT_PLAN"; then
+  printf '%s\n' "Empty export guard plan must be marked completed." >&2
   exit 1
 fi
 
