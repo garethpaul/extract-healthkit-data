@@ -35,6 +35,9 @@ Helpful reports include:
 - Provisioning profiles, signing certificates, certificate requests, app
   archives, and archive intermediates are local build artifacts and should not
   be committed or shared in vulnerability reports.
+- HealthKit export payloads should be validated as Foundation JSON objects
+  before serialization so unsupported payload shapes fail closed before network
+  handling.
 
 ## Mobile Privacy Notes
 

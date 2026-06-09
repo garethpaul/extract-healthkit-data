@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Rejected non-JSON-serializable HealthKit export payloads before building the
+  POST body.
 - Rejected HealthKit export endpoints with query strings or fragments.
 - Rejected HealthKit export endpoints with embedded username/password userinfo.
 - Extracted HealthKit export payload construction into a dedicated helper.

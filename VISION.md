@@ -33,6 +33,7 @@ Current baseline:
   fragment, and does not log the step payload.
 - Export builds an explicit `date`/`value` payload and skips the network request
   when no step rows are available.
+- Export serialization only runs for Foundation-valid JSON objects.
 - `.gitignore` and the static baseline keep local provisioning profiles,
   signing certificates, certificate requests, app archives, and archive
   intermediates out of source control.
@@ -51,6 +52,7 @@ Contribution rules:
 - Run `scripts/check-baseline.sh` before pushing HealthKit/export changes.
 - Verify HealthKit behavior on a capable device when changing data access.
 - Keep exported payload shape documented.
+- Keep export payloads constrained to valid JSON objects before serialization.
 - Keep empty or failed data reads from triggering export network calls.
 - Keep signing material, provisioning profiles, and local archives untracked.
 - Do not mix toolchain migration with privacy-sensitive behavior changes.

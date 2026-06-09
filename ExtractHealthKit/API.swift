@@ -41,6 +41,9 @@ func postRequest(payload: AnyObject) -> Bool {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if !NSJSONSerialization.isValidJSONObject(payload) {
+            return false
+        }
         var error: NSError?
         let body = NSJSONSerialization.dataWithJSONObject(payload, options: nil, error: &error)
         if error != nil || body == nil {

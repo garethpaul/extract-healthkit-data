@@ -63,6 +63,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   confirms the export alert.
 - Export payloads contain `date` and `value` fields for collected step rows;
   no network request is made when there are no step rows to export.
+- Export requests are only serialized when the payload is one of Foundation's
+  valid JSON objects.
 
 ## Testing and Verification
 
@@ -117,6 +119,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   the endpoint query-string and fragment guard.
 - See `docs/plans/2026-06-09-healthkit-signing-artifact-guard.md` for the
   signing and archive artifact guard.
+- See `docs/plans/2026-06-09-healthkit-json-payload-validation.md` for the
+  JSON payload validation guard.
 
 ## Contributing
 
