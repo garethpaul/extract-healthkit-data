@@ -10,6 +10,7 @@ import Foundation
 import Alamofire
 
 let HealthKitExportEndpointKey = "HealthKitExportEndpoint"
+let HealthKitExportTimeout: NSTimeInterval = 30
 
 func exportEndpointURL() -> NSURL? {
     let endpoint = NSBundle.mainBundle().objectForInfoDictionaryKey(HealthKitExportEndpointKey) as? String
@@ -40,6 +41,7 @@ func postRequest(payload: AnyObject) -> Bool {
     if let url = exportEndpointURL() {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "POST"
+        request.timeoutInterval = HealthKitExportTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if !NSJSONSerialization.isValidJSONObject(payload) {
             return false

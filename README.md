@@ -67,6 +67,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   skips the network request if filtering leaves no rows.
 - Export requests are only serialized when the payload is one of Foundation's
   valid JSON objects.
+- Export requests use a bounded timeout before being handed to Alamofire.
 - HealthKit authorization and query failures use generic log messages instead
   of raw HealthKit error descriptions.
 
@@ -129,6 +130,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   HealthKit error logging guard.
 - See `docs/plans/2026-06-09-healthkit-export-row-validation.md` for export
   row validation before POST.
+- See `docs/plans/2026-06-09-healthkit-export-timeout.md` for bounded export
+  request timeout handling.
 
 ## Contributing
 

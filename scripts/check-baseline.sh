@@ -16,6 +16,7 @@ SIGNING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-signing-artifact-guard.m
 JSON_PAYLOAD_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-json-payload-validation.md"
 ERROR_LOGGING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-error-logging-guard.md"
 EXPORT_ROW_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-row-validation.md"
+EXPORT_TIMEOUT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-timeout.md"
 
 require_file() {
   path=$1
@@ -47,6 +48,7 @@ for path in \
   "docs/plans/2026-06-09-healthkit-json-payload-validation.md" \
   "docs/plans/2026-06-09-healthkit-error-logging-guard.md" \
   "docs/plans/2026-06-09-healthkit-export-row-validation.md" \
+  "docs/plans/2026-06-09-healthkit-export-timeout.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -58,6 +60,7 @@ if ! grep -Fq "make check" "$README" ||
   ! grep -Fq "query strings, or fragments" "$README" ||
   ! grep -Fq "valid JSON objects" "$README" ||
   ! grep -Fq "valid date/value fields" "$README" ||
+  ! grep -Fq "bounded timeout" "$README" ||
   ! grep -Fq "raw HealthKit error descriptions" "$README" ||
   ! grep -Fq "HealthKit step data is sensitive" "$README"; then
   printf '%s\n' "README must document verification, export configuration, and HealthKit privacy posture." >&2
@@ -70,6 +73,7 @@ if ! grep -Fq "scripts/check-baseline.sh" "$VISION" ||
   ! grep -Fq "query string, or" "$VISION" ||
   ! grep -Fq "valid JSON objects" "$VISION" ||
   ! grep -Fq "valid date/value fields" "$VISION" ||
+  ! grep -Fq "bounded timeout" "$VISION" ||
   ! grep -Fq "HealthKit failure logging" "$VISION" ||
   ! grep -Fq "HealthKitExportEndpoint" "$VISION"; then
   printf '%s\n' "VISION must include the baseline command, read-only HealthKit scope, and endpoint configuration." >&2
@@ -95,7 +99,14 @@ if ! grep -Fq "valid date/value fields" "$ROOT_DIR/SECURITY.md"; then
   exit 1
 fi
 
+if ! grep -Fq "bounded timeout" "$ROOT_DIR/SECURITY.md"; then
+  printf '%s\n' "SECURITY must document HealthKit export request timeout handling." >&2
+  exit 1
+fi
+
 if ! grep -Fq "HealthKitExportEndpointKey" "$API" ||
+  ! grep -Fq "HealthKitExportTimeout" "$API" ||
+  ! grep -Fq "request.timeoutInterval = HealthKitExportTimeout" "$API" ||
   ! grep -Fq "objectForInfoDictionaryKey" "$API" ||
   ! grep -Fq 'url?.scheme == "https"' "$API" ||
   ! grep -Fq "url?.user == nil" "$API" ||
@@ -246,6 +257,11 @@ if ! grep -Fq "status: completed" "$EXPORT_ROW_PLAN"; then
   exit 1
 fi
 
+if ! grep -Fq "Status: Completed" "$EXPORT_TIMEOUT_PLAN"; then
+  printf '%s\n' "HealthKit export timeout plan must be marked completed." >&2
+  exit 1
+fi
+
 if ! grep -Fq "make check" "$ERROR_LOGGING_PLAN"; then
   printf '%s\n' "HealthKit error logging guard plan must record make check verification." >&2
   exit 1
@@ -253,6 +269,11 @@ fi
 
 if ! grep -Fq "make check" "$EXPORT_ROW_PLAN"; then
   printf '%s\n' "HealthKit export row validation plan must record make check verification." >&2
+  exit 1
+fi
+
+if ! grep -Fq "make check" "$EXPORT_TIMEOUT_PLAN"; then
+  printf '%s\n' "HealthKit export timeout plan must record make check verification." >&2
   exit 1
 fi
 

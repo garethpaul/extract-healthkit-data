@@ -36,6 +36,7 @@ Current baseline:
 - Export payload construction keeps only rows with valid date/value fields and
   skips the network request if filtering leaves no rows.
 - Export serialization only runs for Foundation-valid JSON objects.
+- Export requests use a bounded timeout before Alamofire network handling.
 - HealthKit failure logging uses generic messages instead of raw HealthKit
   error descriptions.
 - `.gitignore` and the static baseline keep local provisioning profiles,

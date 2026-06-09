@@ -42,6 +42,8 @@ Helpful reports include:
   descriptions.
 - HealthKit export payloads should keep only rows with valid date/value fields
   and skip network handling if filtering leaves no rows.
+- HealthKit export requests should use a bounded timeout before network
+  handling.
 
 ## Mobile Privacy Notes
 
