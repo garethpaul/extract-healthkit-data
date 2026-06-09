@@ -10,6 +10,7 @@ VIEW="$ROOT_DIR/ExtractHealthKit/ViewController.swift"
 PLAN="$ROOT_DIR/docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"
 ENDPOINT_PLAN="$ROOT_DIR/docs/plans/2026-06-08-healthkit-endpoint-host-validation.md"
 EMPTY_EXPORT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-empty-export-guard.md"
+USERINFO_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md"
 
 require_file() {
   path=$1
@@ -35,6 +36,7 @@ for path in \
   "ExtractHealthKit/ViewController.swift" \
   "ExtractHealthKit/Steps.swift" \
   "docs/plans/2026-06-09-healthkit-empty-export-guard.md" \
+  "docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -66,6 +68,8 @@ fi
 if ! grep -Fq "HealthKitExportEndpointKey" "$API" ||
   ! grep -Fq "objectForInfoDictionaryKey" "$API" ||
   ! grep -Fq 'url?.scheme == "https"' "$API" ||
+  ! grep -Fq "url?.user == nil" "$API" ||
+  ! grep -Fq "url?.password == nil" "$API" ||
   ! grep -Fq "if let host = url?.host" "$API" ||
   ! grep -Fq "!host.isEmpty" "$API" ||
   ! grep -Fq "stringByTrimmingCharactersInSet" "$API" ||
@@ -148,6 +152,11 @@ fi
 
 if ! grep -Fq "status: completed" "$EMPTY_EXPORT_PLAN"; then
   printf '%s\n' "Empty export guard plan must be marked completed." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$USERINFO_PLAN"; then
+  printf '%s\n' "Endpoint userinfo guard plan must be marked completed." >&2
   exit 1
 fi
 

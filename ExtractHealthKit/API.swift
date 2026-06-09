@@ -18,7 +18,7 @@ func exportEndpointURL() -> NSURL? {
     if let configuredEndpoint = trimmedEndpoint {
         if !configuredEndpoint.isEmpty {
             let url = NSURL(string: configuredEndpoint)
-            if url?.scheme == "https" {
+            if url?.scheme == "https" && url?.user == nil && url?.password == nil {
                 if let host = url?.host {
                     if !host.isEmpty {
                         return url

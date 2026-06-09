@@ -29,7 +29,8 @@ Current baseline:
   project settings.
 - The app requests read-only HealthKit step-count access.
 - Export uses `HealthKitExportEndpoint` from app metadata, requires an HTTPS URL
-  with a host, and does not log the step payload.
+  with a host and no embedded username/password userinfo, and does not log the
+  step payload.
 - Export builds an explicit `date`/`value` payload and skips the network request
   when no step rows are available.
 - HealthKit query errors no longer abort the app.
@@ -59,8 +60,8 @@ Canonical security policy and reporting:
 HealthKit step data is sensitive. The app should request only the data it needs,
 make export behavior explicit, and avoid logging or committing health data.
 
-Remote endpoint changes must use HTTPS, include a host, and use documented
-configuration.
+Remote endpoint changes must use HTTPS, include a host, avoid embedded
+username/password userinfo, and use documented configuration.
 
 ## What We Will Not Merge (For Now)
 
