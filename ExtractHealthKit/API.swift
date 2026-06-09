@@ -19,7 +19,11 @@ func exportEndpointURL() -> NSURL? {
         if !configuredEndpoint.isEmpty {
             let url = NSURL(string: configuredEndpoint)
             if url?.scheme == "https" {
-                return url
+                if let host = url?.host {
+                    if !host.isEmpty {
+                        return url
+                    }
+                }
             }
         }
     }

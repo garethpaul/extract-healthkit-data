@@ -8,6 +8,7 @@ PROJECT="$ROOT_DIR/ExtractHealthKit.xcodeproj/project.pbxproj"
 API="$ROOT_DIR/ExtractHealthKit/API.swift"
 VIEW="$ROOT_DIR/ExtractHealthKit/ViewController.swift"
 PLAN="$ROOT_DIR/docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"
+ENDPOINT_PLAN="$ROOT_DIR/docs/plans/2026-06-08-healthkit-endpoint-host-validation.md"
 
 require_file() {
   path=$1
@@ -32,12 +33,14 @@ for path in \
   "ExtractHealthKit/API.swift" \
   "ExtractHealthKit/ViewController.swift" \
   "ExtractHealthKit/Steps.swift" \
+  "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
 done
 
 if ! grep -Fq "make check" "$README" ||
   ! grep -Fq "HealthKitExportEndpoint" "$README" ||
+  ! grep -Fq "includes a host" "$README" ||
   ! grep -Fq "HealthKit step data is sensitive" "$README"; then
   printf '%s\n' "README must document verification, export configuration, and HealthKit privacy posture." >&2
   exit 1
@@ -45,6 +48,7 @@ fi
 
 if ! grep -Fq "scripts/check-baseline.sh" "$VISION" ||
   ! grep -Fq "read-only HealthKit step-count access" "$VISION" ||
+  ! grep -Fq "HTTPS URL" "$VISION" ||
   ! grep -Fq "HealthKitExportEndpoint" "$VISION"; then
   printf '%s\n' "VISION must include the baseline command, read-only HealthKit scope, and endpoint configuration." >&2
   exit 1
@@ -60,9 +64,11 @@ fi
 if ! grep -Fq "HealthKitExportEndpointKey" "$API" ||
   ! grep -Fq "objectForInfoDictionaryKey" "$API" ||
   ! grep -Fq 'url?.scheme == "https"' "$API" ||
+  ! grep -Fq "if let host = url?.host" "$API" ||
+  ! grep -Fq "!host.isEmpty" "$API" ||
   ! grep -Fq "stringByTrimmingCharactersInSet" "$API" ||
   ! grep -Fq "return false" "$API"; then
-  printf '%s\n' "API.swift must keep endpoint lookup, HTTPS validation, and failed-send return behavior." >&2
+  printf '%s\n' "API.swift must keep endpoint lookup, HTTPS host validation, and failed-send return behavior." >&2
   exit 1
 fi
 
@@ -113,6 +119,11 @@ fi
 
 if ! grep -Fq "status: completed" "$PLAN"; then
   printf '%s\n' "Plan must be marked completed." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$ENDPOINT_PLAN"; then
+  printf '%s\n' "Endpoint host validation plan must be marked completed." >&2
   exit 1
 fi
 

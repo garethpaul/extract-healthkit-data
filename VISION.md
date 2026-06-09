@@ -28,8 +28,8 @@ Current baseline:
   HealthKit plist and entitlement metadata, locked CocoaPods versions, and Xcode
   project settings.
 - The app requests read-only HealthKit step-count access.
-- Export uses `HealthKitExportEndpoint` from app metadata, requires HTTPS, and
-  does not log the step payload.
+- Export uses `HealthKitExportEndpoint` from app metadata, requires an HTTPS URL
+  with a host, and does not log the step payload.
 - HealthKit query errors no longer abort the app.
 
 Next priorities:
@@ -56,7 +56,8 @@ Canonical security policy and reporting:
 HealthKit step data is sensitive. The app should request only the data it needs,
 make export behavior explicit, and avoid logging or committing health data.
 
-Remote endpoint changes must use HTTPS and documented configuration.
+Remote endpoint changes must use HTTPS, include a host, and use documented
+configuration.
 
 ## What We Will Not Merge (For Now)
 

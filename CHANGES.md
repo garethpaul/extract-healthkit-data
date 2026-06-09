@@ -4,6 +4,8 @@
 
 - Moved the HealthKit export endpoint to the `HealthKitExportEndpoint` app
   metadata key and require HTTPS before sending.
+- Require configured export endpoints to include a non-empty host before
+  sending HealthKit payloads.
 - Removed export payload logging and query-error `abort()` behavior.
 - Requested read-only HealthKit step-count authorization.
 - Added static privacy, entitlement, Podfile, plist, and source verification via
