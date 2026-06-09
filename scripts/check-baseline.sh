@@ -12,6 +12,7 @@ ENDPOINT_PLAN="$ROOT_DIR/docs/plans/2026-06-08-healthkit-endpoint-host-validatio
 EMPTY_EXPORT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-empty-export-guard.md"
 USERINFO_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md"
 URL_PARTS_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md"
+SIGNING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-signing-artifact-guard.md"
 
 require_file() {
   path=$1
@@ -39,6 +40,7 @@ for path in \
   "docs/plans/2026-06-09-healthkit-empty-export-guard.md" \
   "docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md" \
   "docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md" \
+  "docs/plans/2026-06-09-healthkit-signing-artifact-guard.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -92,6 +94,27 @@ if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "let json = exportPayload(self.outData)" "$VIEW" ||
   ! grep -Fq "HealthKit export endpoint is not configured." "$VIEW"; then
   printf '%s\n' "ViewController must keep read-only HealthKit authorization and explicit export failure handling." >&2
+  exit 1
+fi
+
+for pattern in \
+  "*.mobileprovision" \
+  "*.provisionprofile" \
+  "*.p12" \
+  "*.cer" \
+  "*.certSigningRequest" \
+  "*.xcarchive/" \
+  "ArchiveIntermediates/"; do
+  if ! grep -Fq "$pattern" "$ROOT_DIR/.gitignore"; then
+    printf '%s\n' ".gitignore must keep signing and archive artifact pattern: $pattern" >&2
+    exit 1
+  fi
+done
+
+tracked_signing_artifacts=$(git -C "$ROOT_DIR" ls-files | grep -E '(^|/)([^/]+\.(mobileprovision|provisionprofile|p12|cer|certSigningRequest)|[^/]+\.xcarchive(/|$)|ArchiveIntermediates(/|$))' || true)
+if [ -n "$tracked_signing_artifacts" ]; then
+  printf '%s\n' "Signing or local archive artifacts must not be tracked:" >&2
+  printf '%s\n' "$tracked_signing_artifacts" >&2
   exit 1
 fi
 
@@ -168,6 +191,11 @@ fi
 
 if ! grep -Fq "status: completed" "$URL_PARTS_PLAN"; then
   printf '%s\n' "Endpoint query/fragment guard plan must be marked completed." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$SIGNING_PLAN"; then
+  printf '%s\n' "Signing artifact guard plan must be marked completed." >&2
   exit 1
 fi
 

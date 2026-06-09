@@ -16,6 +16,15 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+*.xcarchive/
+ArchiveIntermediates/
+
+# Signing and provisioning material
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.cer
+*.certSigningRequest
 
 # CocoaPods
 #

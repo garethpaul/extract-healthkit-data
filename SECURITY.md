@@ -32,6 +32,9 @@ Helpful reports include:
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found secret-like configuration names that require careful review before use; changes in those areas should receive security-focused review before merge.
 - Dependency manifests detected: Podfile, Podfile.lock. Dependency updates should preserve lockfiles when present and avoid introducing packages without a clear maintenance reason.
+- Provisioning profiles, signing certificates, certificate requests, app
+  archives, and archive intermediates are local build artifacts and should not
+  be committed or shared in vulnerability reports.
 
 ## Mobile Privacy Notes
 

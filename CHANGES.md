@@ -7,6 +7,7 @@
 - Extracted HealthKit export payload construction into a dedicated helper.
 - Skipped export network requests when no step rows are available.
 - Added a static baseline guard and plan for the empty-export behavior.
+- Added source-control guardrails for local signing and archive artifacts.
 
 ## 2026-06-08
 

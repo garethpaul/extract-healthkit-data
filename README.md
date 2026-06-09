@@ -88,6 +88,9 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - `HealthKitExportEndpoint` is the local HTTPS export endpoint setting. It must
   include a host and must not include embedded username/password userinfo,
   query strings, or fragments. Do not commit a private endpoint value.
+- Provisioning profiles, signing certificates, certificate requests, app
+  archives, and archive intermediates are ignored and must stay out of source
+  control.
 
 ## Security and Privacy Notes
 
@@ -112,6 +115,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   endpoint username/password guard.
 - See `docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md` for
   the endpoint query-string and fragment guard.
+- See `docs/plans/2026-06-09-healthkit-signing-artifact-guard.md` for the
+  signing and archive artifact guard.
 
 ## Contributing
 
