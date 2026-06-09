@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Replaced raw HealthKit authorization/query error logging with generic failure
+  messages.
 - Rejected non-JSON-serializable HealthKit export payloads before building the
   POST body.
 - Rejected HealthKit export endpoints with query strings or fragments.

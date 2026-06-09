@@ -112,7 +112,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 }
             }
             else{
-                println("Unsuccessful. \(error.description)")
+                println("HealthKit authorization was not granted.")
             }
         })
         
@@ -142,7 +142,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
             if error != nil {
                 // Perform proper error handling here
-                println("*** An error occurred while calculating the statistics: \(error.localizedDescription) ***")
+                println("HealthKit statistics query failed.")
                 return
             }
             

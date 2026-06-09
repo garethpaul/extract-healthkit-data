@@ -65,6 +65,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   no network request is made when there are no step rows to export.
 - Export requests are only serialized when the payload is one of Foundation's
   valid JSON objects.
+- HealthKit authorization and query failures use generic log messages instead
+  of raw HealthKit error descriptions.
 
 ## Testing and Verification
 
@@ -121,6 +123,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   signing and archive artifact guard.
 - See `docs/plans/2026-06-09-healthkit-json-payload-validation.md` for the
   JSON payload validation guard.
+- See `docs/plans/2026-06-09-healthkit-error-logging-guard.md` for the
+  HealthKit error logging guard.
 
 ## Contributing
 

@@ -38,6 +38,8 @@ Helpful reports include:
 - HealthKit export payloads should be validated as Foundation JSON objects
   before serialization so unsupported payload shapes fail closed before network
   handling.
+- HealthKit authorization and query failures should not log raw HealthKit error
+  descriptions.
 
 ## Mobile Privacy Notes
 

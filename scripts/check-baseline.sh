@@ -14,6 +14,7 @@ USERINFO_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard
 URL_PARTS_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md"
 SIGNING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-signing-artifact-guard.md"
 JSON_PAYLOAD_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-json-payload-validation.md"
+ERROR_LOGGING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-error-logging-guard.md"
 
 require_file() {
   path=$1
@@ -43,6 +44,7 @@ for path in \
   "docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md" \
   "docs/plans/2026-06-09-healthkit-signing-artifact-guard.md" \
   "docs/plans/2026-06-09-healthkit-json-payload-validation.md" \
+  "docs/plans/2026-06-09-healthkit-error-logging-guard.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -53,6 +55,7 @@ if ! grep -Fq "make check" "$README" ||
   ! grep -Fq "includes a host" "$README" ||
   ! grep -Fq "query strings, or fragments" "$README" ||
   ! grep -Fq "valid JSON objects" "$README" ||
+  ! grep -Fq "raw HealthKit error descriptions" "$README" ||
   ! grep -Fq "HealthKit step data is sensitive" "$README"; then
   printf '%s\n' "README must document verification, export configuration, and HealthKit privacy posture." >&2
   exit 1
@@ -63,6 +66,7 @@ if ! grep -Fq "scripts/check-baseline.sh" "$VISION" ||
   ! grep -Fq "HTTPS URL" "$VISION" ||
   ! grep -Fq "query string, or" "$VISION" ||
   ! grep -Fq "valid JSON objects" "$VISION" ||
+  ! grep -Fq "HealthKit failure logging" "$VISION" ||
   ! grep -Fq "HealthKitExportEndpoint" "$VISION"; then
   printf '%s\n' "VISION must include the baseline command, read-only HealthKit scope, and endpoint configuration." >&2
   exit 1
@@ -70,8 +74,15 @@ fi
 
 if grep -Fq "requestlabs.appspot.com" "$API" ||
   grep -Fq "println(json)" "$VIEW" ||
+  grep -Fq "error.description" "$VIEW" ||
+  grep -Fq "error.localizedDescription" "$VIEW" ||
   grep -Fq "abort()" "$VIEW"; then
   printf '%s\n' "Health data export must not use hardcoded endpoints, payload logging, or abort-on-query-error." >&2
+  exit 1
+fi
+
+if ! grep -Fq "raw HealthKit error" "$ROOT_DIR/SECURITY.md"; then
+  printf '%s\n' "SECURITY must document HealthKit error logging boundaries." >&2
   exit 1
 fi
 
@@ -97,6 +108,8 @@ if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "self.outData.isEmpty" "$VIEW" ||
   ! grep -Fq "No HealthKit step data available to export." "$VIEW" ||
   ! grep -Fq "let json = exportPayload(self.outData)" "$VIEW" ||
+  ! grep -Fq "HealthKit authorization was not granted." "$VIEW" ||
+  ! grep -Fq "HealthKit statistics query failed." "$VIEW" ||
   ! grep -Fq "HealthKit export endpoint is not configured." "$VIEW"; then
   printf '%s\n' "ViewController must keep read-only HealthKit authorization and explicit export failure handling." >&2
   exit 1
@@ -206,6 +219,16 @@ fi
 
 if ! grep -Fq "status: completed" "$JSON_PAYLOAD_PLAN"; then
   printf '%s\n' "JSON payload validation plan must be marked completed." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$ERROR_LOGGING_PLAN"; then
+  printf '%s\n' "HealthKit error logging guard plan must be marked completed." >&2
+  exit 1
+fi
+
+if ! grep -Fq "make check" "$ERROR_LOGGING_PLAN"; then
+  printf '%s\n' "HealthKit error logging guard plan must record make check verification." >&2
   exit 1
 fi
 

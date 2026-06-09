@@ -34,6 +34,8 @@ Current baseline:
 - Export builds an explicit `date`/`value` payload and skips the network request
   when no step rows are available.
 - Export serialization only runs for Foundation-valid JSON objects.
+- HealthKit failure logging uses generic messages instead of raw HealthKit
+  error descriptions.
 - `.gitignore` and the static baseline keep local provisioning profiles,
   signing certificates, certificate requests, app archives, and archive
   intermediates out of source control.
