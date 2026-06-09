@@ -2,6 +2,7 @@
 
 ## 2026-06-09
 
+- Rejected HealthKit export endpoints with query strings or fragments.
 - Rejected HealthKit export endpoints with embedded username/password userinfo.
 - Extracted HealthKit export payload construction into a dedicated helper.
 - Skipped export network requests when no step rows are available.

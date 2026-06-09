@@ -11,6 +11,7 @@ PLAN="$ROOT_DIR/docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"
 ENDPOINT_PLAN="$ROOT_DIR/docs/plans/2026-06-08-healthkit-endpoint-host-validation.md"
 EMPTY_EXPORT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-empty-export-guard.md"
 USERINFO_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md"
+URL_PARTS_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md"
 
 require_file() {
   path=$1
@@ -37,6 +38,7 @@ for path in \
   "ExtractHealthKit/Steps.swift" \
   "docs/plans/2026-06-09-healthkit-empty-export-guard.md" \
   "docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md" \
+  "docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -45,6 +47,7 @@ done
 if ! grep -Fq "make check" "$README" ||
   ! grep -Fq "HealthKitExportEndpoint" "$README" ||
   ! grep -Fq "includes a host" "$README" ||
+  ! grep -Fq "query strings, or fragments" "$README" ||
   ! grep -Fq "HealthKit step data is sensitive" "$README"; then
   printf '%s\n' "README must document verification, export configuration, and HealthKit privacy posture." >&2
   exit 1
@@ -53,6 +56,7 @@ fi
 if ! grep -Fq "scripts/check-baseline.sh" "$VISION" ||
   ! grep -Fq "read-only HealthKit step-count access" "$VISION" ||
   ! grep -Fq "HTTPS URL" "$VISION" ||
+  ! grep -Fq "query string, or" "$VISION" ||
   ! grep -Fq "HealthKitExportEndpoint" "$VISION"; then
   printf '%s\n' "VISION must include the baseline command, read-only HealthKit scope, and endpoint configuration." >&2
   exit 1
@@ -70,6 +74,8 @@ if ! grep -Fq "HealthKitExportEndpointKey" "$API" ||
   ! grep -Fq 'url?.scheme == "https"' "$API" ||
   ! grep -Fq "url?.user == nil" "$API" ||
   ! grep -Fq "url?.password == nil" "$API" ||
+  ! grep -Fq "url?.query == nil" "$API" ||
+  ! grep -Fq "url?.fragment == nil" "$API" ||
   ! grep -Fq "if let host = url?.host" "$API" ||
   ! grep -Fq "!host.isEmpty" "$API" ||
   ! grep -Fq "stringByTrimmingCharactersInSet" "$API" ||
@@ -157,6 +163,11 @@ fi
 
 if ! grep -Fq "status: completed" "$USERINFO_PLAN"; then
   printf '%s\n' "Endpoint userinfo guard plan must be marked completed." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$URL_PARTS_PLAN"; then
+  printf '%s\n' "Endpoint query/fragment guard plan must be marked completed." >&2
   exit 1
 fi
 

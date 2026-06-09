@@ -56,8 +56,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Open `ExtractHealthKit.xcworkspace` after `pod install`, choose the app
   scheme, and run it on a HealthKit-capable device.
 - Configure `HealthKitExportEndpoint` in local app metadata with an HTTPS URL
-  that includes a host and does not embed username/password userinfo before
-  using export. The committed value is intentionally empty.
+  that includes a host and does not embed username/password userinfo, query
+  strings, or fragments before using export. The committed value is
+  intentionally empty.
 - The app requests read-only step-count access and only exports after the user
   confirms the export alert.
 - Export payloads contain `date` and `value` fields for collected step rows;
@@ -85,8 +86,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Keep endpoint URLs, API keys, OAuth credentials, tokens, signing material, and
   account-specific values in local configuration only.
 - `HealthKitExportEndpoint` is the local HTTPS export endpoint setting. It must
-  include a host and must not include embedded username/password userinfo. Do
-  not commit a private endpoint value.
+  include a host and must not include embedded username/password userinfo,
+  query strings, or fragments. Do not commit a private endpoint value.
 
 ## Security and Privacy Notes
 
@@ -109,6 +110,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   empty-export guard and payload-shape plan.
 - See `docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md` for the
   endpoint username/password guard.
+- See `docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md` for
+  the endpoint query-string and fragment guard.
 
 ## Contributing
 
