@@ -9,6 +9,8 @@
 import UIKit
 import HealthKit
 
+let HealthKitExportMaxRows = 31
+
 func validExportField(value: String) -> String? {
     let trimmedValue = value.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
     if trimmedValue.isEmpty {
@@ -19,7 +21,12 @@ func validExportField(value: String) -> String? {
 
 func exportPayload(steps: [Steps]) -> [AnyObject] {
     var json = [AnyObject]()
+    var inspectedRows = 0
     for item in steps {
+        if inspectedRows >= HealthKitExportMaxRows {
+            break
+        }
+        inspectedRows += 1
         if let date = validExportField(item.date) {
             if let value = validExportField(item.value) {
                 json.append(["date": date, "value": value])

@@ -18,6 +18,7 @@ ERROR_LOGGING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-error-logging-guar
 EXPORT_ROW_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-row-validation.md"
 EXPORT_TIMEOUT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-timeout.md"
 CI_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-ci-baseline.md"
+EXPORT_BOUNDS_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-export-volume-bounds.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
 require_file() {
@@ -53,6 +54,7 @@ for path in \
   "docs/plans/2026-06-09-healthkit-export-row-validation.md" \
   "docs/plans/2026-06-09-healthkit-export-timeout.md" \
   "docs/plans/2026-06-10-healthkit-ci-baseline.md" \
+  "docs/plans/2026-06-10-healthkit-export-volume-bounds.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -125,6 +127,8 @@ fi
 
 if ! grep -Fq "HealthKitExportEndpointKey" "$API" ||
   ! grep -Fq "HealthKitExportTimeout" "$API" ||
+  ! grep -Fq "HealthKitExportMaxPayloadBytes" "$API" ||
+  ! grep -Fq "encodedBody.length > HealthKitExportMaxPayloadBytes" "$API" ||
   ! grep -Fq "request.timeoutInterval = HealthKitExportTimeout" "$API" ||
   ! grep -Fq "objectForInfoDictionaryKey" "$API" ||
   ! grep -Fq 'url?.scheme == "https"' "$API" ||
@@ -144,6 +148,8 @@ fi
 if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "readTypes: dataToRead" "$VIEW" ||
   ! grep -Fq "func exportPayload(steps: [Steps]) -> [AnyObject]" "$VIEW" ||
+  ! grep -Fq "HealthKitExportMaxRows = 31" "$VIEW" ||
+  ! grep -Fq "inspectedRows >= HealthKitExportMaxRows" "$VIEW" ||
   ! grep -Fq "func validExportField(value: String) -> String?" "$VIEW" ||
   ! grep -Fq "stringByTrimmingCharactersInSet" "$VIEW" ||
   ! grep -Fq "self.outData.isEmpty" "$VIEW" ||
@@ -190,6 +196,32 @@ filtered_guard = source.find("json.isEmpty")
 post = source.find("postRequest(json)")
 if -1 in (empty_guard, payload, filtered_guard, post) or not (empty_guard < payload < filtered_guard < post):
     print("HealthKit export must guard empty data before building, filter invalid rows, then post the payload.", file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+python3 - "$API" "$VIEW" <<'PY'
+import sys
+from pathlib import Path
+
+api = Path(sys.argv[1]).read_text(encoding="utf-8")
+view = Path(sys.argv[2]).read_text(encoding="utf-8")
+
+payload_limit = api.find("encodedBody.length > HealthKitExportMaxPayloadBytes")
+body_assignment = api.find("request.HTTPBody = encodedBody")
+request_start = api.find("Alamofire.request(request)")
+if -1 in (payload_limit, body_assignment, request_start) or not (
+    payload_limit < body_assignment < request_start
+):
+    print("HealthKit payload size must be checked before assigning or sending the request body.", file=sys.stderr)
+    raise SystemExit(1)
+
+row_limit = view.find("inspectedRows >= HealthKitExportMaxRows")
+field_validation = view.find("if let date = validExportField(item.date)")
+payload_append = view.find('json.append(["date": date, "value": value])')
+if -1 in (row_limit, field_validation, payload_append) or not (
+    row_limit < field_validation < payload_append
+):
+    print("HealthKit row limit must be enforced before validating and appending export rows.", file=sys.stderr)
     raise SystemExit(1)
 PY
 
@@ -300,6 +332,12 @@ if ! grep -Fq "Status: Completed" "$CI_PLAN" ||
   ! grep -Fq "xcodebuild -list" "$CI_PLAN" ||
   ! grep -Fq "make check" "$CI_PLAN"; then
   printf '%s\n' "HealthKit CI plan must remain completed with hosted Xcode verification recorded." >&2
+  exit 1
+fi
+
+if ! grep -Fq "Status: Completed" "$EXPORT_BOUNDS_PLAN" ||
+  ! grep -Fq "make check" "$EXPORT_BOUNDS_PLAN"; then
+  printf '%s\n' "HealthKit export volume plan must remain completed with verification recorded." >&2
   exit 1
 fi
 

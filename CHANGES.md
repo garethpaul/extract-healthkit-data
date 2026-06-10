@@ -2,6 +2,10 @@
 
 ## 2026-06-10
 
+- Bounded HealthKit export construction to 31 inspected daily rows and rejected
+  encoded JSON payloads over 64 KiB before network handling.
+- Added ordering guards and documentation for both privacy-oriented egress
+  limits.
 - Added a pinned, read-only `macos-15` GitHub Actions workflow that runs the
   privacy baseline and hosted Xcode project parse.
 - Kept hosted checks offline and free of HealthKit records, endpoint values,

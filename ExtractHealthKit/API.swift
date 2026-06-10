@@ -11,6 +11,7 @@ import Alamofire
 
 let HealthKitExportEndpointKey = "HealthKitExportEndpoint"
 let HealthKitExportTimeout: NSTimeInterval = 30
+let HealthKitExportMaxPayloadBytes = 64 * 1024
 
 func exportEndpointURL() -> NSURL? {
     let endpoint = NSBundle.mainBundle().objectForInfoDictionaryKey(HealthKitExportEndpointKey) as? String
@@ -51,7 +52,12 @@ func postRequest(payload: AnyObject) -> Bool {
         if error != nil || body == nil {
             return false
         }
-        request.HTTPBody = body
+        if let encodedBody = body {
+            if encodedBody.length > HealthKitExportMaxPayloadBytes {
+                return false
+            }
+            request.HTTPBody = encodedBody
+        }
         Alamofire.request(request)
         return true
     }
