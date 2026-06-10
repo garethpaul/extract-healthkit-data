@@ -83,6 +83,11 @@ make check
 entitlement metadata, Podfile lock versions, and Xcode project settings. When
 `xcodebuild` is available, it also checks that Xcode can parse the project.
 
+GitHub Actions runs `make check` on a fixed `macos-15` runner for pushes, pull
+requests, and manual dispatches. The job pins checkout by commit, uses read-only
+repository permissions, and exercises the Xcode project parse without HealthKit
+records, endpoint values, credentials, simulators, or devices.
+
 For full verification, run the app on a HealthKit-capable device with test data
 you control.
 
@@ -132,6 +137,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   row validation before POST.
 - See `docs/plans/2026-06-09-healthkit-export-timeout.md` for bounded export
   request timeout handling.
+- See `docs/plans/2026-06-10-healthkit-ci-baseline.md` for the hosted macOS and
+  Xcode project-parse baseline.
 
 ## Contributing
 

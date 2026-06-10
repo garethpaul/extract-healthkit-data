@@ -43,6 +43,8 @@ Current baseline:
   signing certificates, certificate requests, app archives, and archive
   intermediates out of source control.
 - HealthKit query errors no longer abort the app.
+- GitHub Actions runs the offline privacy baseline and Xcode project parse on a
+  fixed macOS runner before review.
 
 Next priorities:
 
@@ -55,6 +57,7 @@ Contribution rules:
 
 - One PR = one focused HealthKit, export, build, or documentation change.
 - Run `scripts/check-baseline.sh` before pushing HealthKit/export changes.
+- Keep `.github/workflows/check.yml` aligned with the local privacy baseline.
 - Verify HealthKit behavior on a capable device when changing data access.
 - Keep exported payload shape documented.
 - Keep export payloads constrained to valid JSON objects before serialization.

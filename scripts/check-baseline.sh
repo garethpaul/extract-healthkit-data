@@ -17,6 +17,8 @@ JSON_PAYLOAD_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-json-payload-valida
 ERROR_LOGGING_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-error-logging-guard.md"
 EXPORT_ROW_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-row-validation.md"
 EXPORT_TIMEOUT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-timeout.md"
+CI_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-ci-baseline.md"
+CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
 require_file() {
   path=$1
@@ -33,6 +35,7 @@ for path in \
   "README.md" \
   "SECURITY.md" \
   "VISION.md" \
+  ".github/workflows/check.yml" \
   "Podfile" \
   "Podfile.lock" \
   "ExtractHealthKit.xcodeproj/project.pbxproj" \
@@ -49,9 +52,25 @@ for path in \
   "docs/plans/2026-06-09-healthkit-error-logging-guard.md" \
   "docs/plans/2026-06-09-healthkit-export-row-validation.md" \
   "docs/plans/2026-06-09-healthkit-export-timeout.md" \
+  "docs/plans/2026-06-10-healthkit-ci-baseline.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
+done
+
+for workflow_contract in \
+  "runs-on: macos-15" \
+  "permissions:" \
+  "contents: read" \
+  "workflow_dispatch:" \
+  "cancel-in-progress: true" \
+  "timeout-minutes: 10" \
+  "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" \
+  "run: make check"; do
+  if ! grep -Fq "$workflow_contract" "$CI_WORKFLOW"; then
+    printf '%s\n' "GitHub Actions HealthKit baseline is missing: $workflow_contract" >&2
+    exit 1
+  fi
 done
 
 if ! grep -Fq "make check" "$README" ||
@@ -274,6 +293,13 @@ fi
 
 if ! grep -Fq "make check" "$EXPORT_TIMEOUT_PLAN"; then
   printf '%s\n' "HealthKit export timeout plan must record make check verification." >&2
+  exit 1
+fi
+
+if ! grep -Fq "Status: Completed" "$CI_PLAN" ||
+  ! grep -Fq "xcodebuild -list" "$CI_PLAN" ||
+  ! grep -Fq "make check" "$CI_PLAN"; then
+  printf '%s\n' "HealthKit CI plan must remain completed with hosted Xcode verification recorded." >&2
   exit 1
 fi
 

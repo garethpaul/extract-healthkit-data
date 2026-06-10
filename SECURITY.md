@@ -44,6 +44,10 @@ Helpful reports include:
   and skip network handling if filtering leaves no rows.
 - HealthKit export requests should use a bounded timeout before network
   handling.
+- GitHub Actions runs the offline privacy baseline and Xcode project parse on a
+  fixed macOS runner with pinned checkout, read-only repository access, and a
+  bounded runtime. Hosted checks must not use real HealthKit records or private
+  endpoint values.
 
 ## Mobile Privacy Notes
 

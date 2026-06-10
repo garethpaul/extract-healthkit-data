@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-10
+
+- Added a pinned, read-only `macos-15` GitHub Actions workflow that runs the
+  privacy baseline and hosted Xcode project parse.
+- Kept hosted checks offline and free of HealthKit records, endpoint values,
+  credentials, signing material, simulators, and devices.
+
 ## 2026-06-09
 
 - Added a bounded timeout to HealthKit export requests before network handling.
