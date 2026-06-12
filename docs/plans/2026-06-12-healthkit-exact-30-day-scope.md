@@ -1,6 +1,6 @@
 # HealthKit Exact 30-Day Scope
 
-## Status: In Progress
+## Status: Completed
 
 ## Goal
 
@@ -52,3 +52,27 @@ This remains a legacy Swift sample that current Xcode can parse but not compile
 without a separate language and dependency migration. This change therefore
 uses the existing Swift-era APIs and relies on source-order/privacy contracts
 plus hosted project parsing.
+
+## Work Completed
+
+- Added `HealthKitExportLookbackDays = 30` as the shared collection and export
+  privacy boundary.
+- Replaced the variable one-calendar-month query with subtraction of exactly 30
+  calendar days.
+- Tightened export payload construction from 31 inspected rows to the same
+  30-day limit.
+- Updated current privacy documentation and marked the earlier 31-row defensive
+  boundary as superseded without rewriting its historical record.
+- Extended the static baseline to reject month-based queries, 31-day constants,
+  or drift between query and export limits.
+
+## Verification Completed
+
+- `make check` passes locally; Xcode parsing is skipped because this Linux host
+  does not provide `xcodebuild`.
+- `git diff --check` passes.
+- Restoring `.CalendarUnitMonth, value: -1` makes `make check` fail.
+- Raising `HealthKitExportLookbackDays` to 31 makes `make check` fail.
+- GitHub Actions push run `27391707339` passed on `macos-15`.
+- GitHub Actions pull-request run `27391708457` passed on `macos-15`; both
+  hosted runs completed the Xcode project parse.

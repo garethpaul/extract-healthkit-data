@@ -85,6 +85,7 @@ if ! grep -Fq "make check" "$README" ||
   ! grep -Fq "valid date/value fields" "$README" ||
   ! grep -Fq "bounded timeout" "$README" ||
   ! grep -Fq "raw HealthKit error descriptions" "$README" ||
+  ! grep -Fq "exact 30-day lookback" "$README" ||
   ! grep -Fq "HealthKit step data is sensitive" "$README"; then
   printf '%s\n' "README must document verification, export configuration, and HealthKit privacy posture." >&2
   exit 1
@@ -98,6 +99,7 @@ if ! grep -Fq "scripts/check-baseline.sh" "$VISION" ||
   ! grep -Fq "valid date/value fields" "$VISION" ||
   ! grep -Fq "bounded timeout" "$VISION" ||
   ! grep -Fq "HealthKit failure logging" "$VISION" ||
+  ! grep -Fq "exact 30-day limit" "$VISION" ||
   ! grep -Fq "HealthKitExportEndpoint" "$VISION"; then
   printf '%s\n' "VISION must include the baseline command, read-only HealthKit scope, and endpoint configuration." >&2
   exit 1
@@ -114,6 +116,11 @@ fi
 
 if ! grep -Fq "raw HealthKit error" "$ROOT_DIR/SECURITY.md"; then
   printf '%s\n' "SECURITY must document HealthKit error logging boundaries." >&2
+  exit 1
+fi
+
+if ! grep -Fq "exact 30-day limit" "$ROOT_DIR/SECURITY.md"; then
+  printf '%s\n' "SECURITY must document the exact HealthKit collection and export boundary." >&2
   exit 1
 fi
 
@@ -343,6 +350,13 @@ fi
 if ! grep -Fq "Status: Completed" "$EXPORT_BOUNDS_PLAN" ||
   ! grep -Fq "make check" "$EXPORT_BOUNDS_PLAN"; then
   printf '%s\n' "HealthKit export volume plan must remain completed with verification recorded." >&2
+  exit 1
+fi
+
+if ! grep -Fq "Status: Completed" "$EXACT_SCOPE_PLAN" ||
+  ! grep -Fq "27391707339" "$EXACT_SCOPE_PLAN" ||
+  ! grep -Fq "27391708457" "$EXACT_SCOPE_PLAN"; then
+  printf '%s\n' "Exact 30-day scope plan must remain completed with hosted verification recorded." >&2
   exit 1
 fi
 
