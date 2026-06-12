@@ -9,7 +9,7 @@
 import UIKit
 import HealthKit
 
-let HealthKitExportMaxRows = 31
+let HealthKitExportLookbackDays = 30
 
 func validExportField(value: String) -> String? {
     let trimmedValue = value.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
@@ -23,7 +23,7 @@ func exportPayload(steps: [Steps]) -> [AnyObject] {
     var json = [AnyObject]()
     var inspectedRows = 0
     for item in steps {
-        if inspectedRows >= HealthKitExportMaxRows {
+        if inspectedRows >= HealthKitExportLookbackDays {
             break
         }
         inspectedRows += 1
@@ -166,7 +166,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
             
             let endDate = NSDate()
-            let startDate = calendar.dateByAddingUnit(.CalendarUnitMonth, value: -1, toDate: endDate, options: nil)
+            let startDate = calendar.dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays, toDate: endDate, options: nil)
             results.enumerateStatisticsFromDate(startDate, toDate: endDate) {
                 statistics, stop in
                 

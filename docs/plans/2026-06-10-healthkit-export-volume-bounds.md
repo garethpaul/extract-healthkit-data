@@ -28,3 +28,9 @@ prevent unexpectedly large JSON bodies from reaching network handling.
 
 The project remains a legacy Swift sample; hosted macOS verification parses the
 Xcode project but does not claim modern Swift compilation compatibility.
+
+## Superseded Boundary
+
+The original 31-row defensive cap was tightened on 2026-06-12 by
+`2026-06-12-healthkit-exact-30-day-scope.md`. Current collection and export use
+one exact 30-day constant so the implementation matches the consent alert.
