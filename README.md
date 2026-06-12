@@ -88,7 +88,8 @@ entitlement metadata, Podfile lock versions, and Xcode project settings. When
 
 GitHub Actions runs `make check` on a fixed `macos-15` runner for pushes, pull
 requests, and manual dispatches. The job pins checkout by commit, uses read-only
-repository permissions, and exercises the Xcode project parse without HealthKit
+repository permissions, does not persist the checkout credential, and exercises
+the Xcode project parse without HealthKit
 records, endpoint values, credentials, simulators, or devices.
 
 For full verification, run the app on a HealthKit-capable device with test data
