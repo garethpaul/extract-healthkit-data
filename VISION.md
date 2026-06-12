@@ -47,7 +47,7 @@ Current baseline:
   intermediates out of source control.
 - HealthKit query errors no longer abort the app.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
-  fixed macOS runner before review.
+  fixed macOS runner with a credential-free checkout before review.
 
 Next priorities:
 

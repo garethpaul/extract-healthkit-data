@@ -48,8 +48,9 @@ Helpful reports include:
   most 30 daily rows, and reject encoded payloads over 64 KiB before assigning
   an HTTP body or starting network handling.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
-  fixed macOS runner with pinned checkout, read-only repository access, and a
-  bounded runtime. Hosted checks must not use real HealthKit records or private
+  fixed macOS runner with pinned checkout, read-only repository access, a
+  credential-free checkout, and a bounded runtime. Hosted checks must not use
+  real HealthKit records or private
   endpoint values.
 
 ## Mobile Privacy Notes

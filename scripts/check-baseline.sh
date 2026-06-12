@@ -20,6 +20,7 @@ EXPORT_TIMEOUT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-timeout.md
 CI_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-ci-baseline.md"
 EXPORT_BOUNDS_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-export-volume-bounds.md"
 EXACT_SCOPE_PLAN="$ROOT_DIR/docs/plans/2026-06-12-healthkit-exact-30-day-scope.md"
+CHECKOUT_CREDENTIAL_PLAN="$ROOT_DIR/docs/plans/2026-06-12-checkout-credential-boundary.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
 require_file() {
@@ -57,10 +58,19 @@ for path in \
   "docs/plans/2026-06-10-healthkit-ci-baseline.md" \
   "docs/plans/2026-06-10-healthkit-export-volume-bounds.md" \
   "docs/plans/2026-06-12-healthkit-exact-30-day-scope.md" \
+  "docs/plans/2026-06-12-checkout-credential-boundary.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
 done
+
+workflow_count=$(find "$ROOT_DIR/.github/workflows" -type f \( -name '*.yml' -o -name '*.yaml' \) | wc -l | tr -d ' ')
+checkout_count=$(grep -Ec '^[[:space:]]*-[[:space:]]*uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10' "$CI_WORKFLOW" || true)
+credential_boundary_count=$(grep -Ec '^[[:space:]]*persist-credentials:[[:space:]]*false([[:space:]]|$)' "$CI_WORKFLOW" || true)
+if [ "$workflow_count" -ne 1 ] || [ "$checkout_count" -ne 1 ] || [ "$credential_boundary_count" -ne 1 ]; then
+  printf '%s\n' "GitHub Actions must keep one workflow with one pinned, credential-free checkout." >&2
+  exit 1
+fi
 
 for workflow_contract in \
   "runs-on: macos-15" \
@@ -344,6 +354,12 @@ if ! grep -Fq "Status: Completed" "$CI_PLAN" ||
   ! grep -Fq "xcodebuild -list" "$CI_PLAN" ||
   ! grep -Fq "make check" "$CI_PLAN"; then
   printf '%s\n' "HealthKit CI plan must remain completed with hosted Xcode verification recorded." >&2
+  exit 1
+fi
+
+if ! grep -Fq "Status: Completed" "$CHECKOUT_CREDENTIAL_PLAN" ||
+  ! grep -Fq "make check" "$CHECKOUT_CREDENTIAL_PLAN"; then
+  printf '%s\n' "Checkout credential boundary plan must record completed make check verification." >&2
   exit 1
 fi
 
