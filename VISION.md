@@ -37,8 +37,9 @@ Current baseline:
   skips the network request if filtering leaves no rows.
 - Export serialization only runs for Foundation-valid JSON objects.
 - Export requests use a bounded timeout before Alamofire network handling.
-- Export volume is capped at 31 inspected rows and 64 KiB of encoded JSON before
-  network handling.
+- HealthKit collection and export share an exact 30-day limit, with payloads
+  capped at 30 inspected daily rows and 64 KiB of encoded JSON before network
+  handling.
 - HealthKit failure logging uses generic messages instead of raw HealthKit
   error descriptions.
 - `.gitignore` and the static baseline keep local provisioning profiles,
