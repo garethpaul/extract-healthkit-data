@@ -65,9 +65,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   no network request is made when there are no step rows to export.
 - Export payload construction keeps only rows with valid date/value fields and
   skips the network request if filtering leaves no rows.
-- Export construction inspects at most 31 daily rows, matching the stated
-  30-day scope, and rejects encoded JSON larger than 64 KiB before network
-  handling.
+- The HealthKit query uses an exact 30-day lookback, and export construction
+  inspects at most the same 30 daily rows before rejecting encoded JSON larger
+  than 64 KiB or handing data to network code.
 - Export requests are only serialized when the payload is one of Foundation's
   valid JSON objects.
 - Export requests use a bounded timeout before being handed to Alamofire.
@@ -116,8 +116,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include ExtractHealthKit/API.swift, ExtractHealthKit/Alamofire.swift, ExtractHealthKit/Info.plist, ExtractHealthKit/SwiftyJSON.swift, and 2 more.
 - Do not log, commit, or fixture real HealthKit records. Use synthetic data for
   verification notes and tests.
-- Keep HealthKit egress bounded to 31 inspected rows and 64 KiB of encoded JSON
-  before a request is queued.
+- Keep HealthKit collection and egress bounded to the shared 30-day limit and
+  64 KiB of encoded JSON before a request is queued.
 
 ## Maintenance Notes
 
@@ -146,6 +146,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   Xcode project-parse baseline.
 - See `docs/plans/2026-06-10-healthkit-export-volume-bounds.md` for row and JSON
   byte limits before HealthKit export.
+- See `docs/plans/2026-06-12-healthkit-exact-30-day-scope.md` for the shared
+  query and export lookback boundary.
 
 ## Contributing
 

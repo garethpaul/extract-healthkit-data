@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-12
+
+- Replaced the variable-length one-calendar-month HealthKit query with an exact
+  30-day lookback matching the export confirmation alert.
+- Reused the same 30-day constant as the maximum inspected export rows so data
+  collection and egress cannot drift to a 31-day scope.
+
 ## 2026-06-10
 
 - Bounded HealthKit export construction to 31 inspected daily rows and rejected

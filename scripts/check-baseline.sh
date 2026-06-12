@@ -19,6 +19,7 @@ EXPORT_ROW_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-row-validation
 EXPORT_TIMEOUT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-timeout.md"
 CI_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-ci-baseline.md"
 EXPORT_BOUNDS_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-export-volume-bounds.md"
+EXACT_SCOPE_PLAN="$ROOT_DIR/docs/plans/2026-06-12-healthkit-exact-30-day-scope.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
 require_file() {
@@ -55,6 +56,7 @@ for path in \
   "docs/plans/2026-06-09-healthkit-export-timeout.md" \
   "docs/plans/2026-06-10-healthkit-ci-baseline.md" \
   "docs/plans/2026-06-10-healthkit-export-volume-bounds.md" \
+  "docs/plans/2026-06-12-healthkit-exact-30-day-scope.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -83,6 +85,7 @@ if ! grep -Fq "make check" "$README" ||
   ! grep -Fq "valid date/value fields" "$README" ||
   ! grep -Fq "bounded timeout" "$README" ||
   ! grep -Fq "raw HealthKit error descriptions" "$README" ||
+  ! grep -Fq "exact 30-day lookback" "$README" ||
   ! grep -Fq "HealthKit step data is sensitive" "$README"; then
   printf '%s\n' "README must document verification, export configuration, and HealthKit privacy posture." >&2
   exit 1
@@ -96,6 +99,7 @@ if ! grep -Fq "scripts/check-baseline.sh" "$VISION" ||
   ! grep -Fq "valid date/value fields" "$VISION" ||
   ! grep -Fq "bounded timeout" "$VISION" ||
   ! grep -Fq "HealthKit failure logging" "$VISION" ||
+  ! grep -Fq "exact 30-day limit" "$VISION" ||
   ! grep -Fq "HealthKitExportEndpoint" "$VISION"; then
   printf '%s\n' "VISION must include the baseline command, read-only HealthKit scope, and endpoint configuration." >&2
   exit 1
@@ -112,6 +116,11 @@ fi
 
 if ! grep -Fq "raw HealthKit error" "$ROOT_DIR/SECURITY.md"; then
   printf '%s\n' "SECURITY must document HealthKit error logging boundaries." >&2
+  exit 1
+fi
+
+if ! grep -Fq "exact 30-day limit" "$ROOT_DIR/SECURITY.md"; then
+  printf '%s\n' "SECURITY must document the exact HealthKit collection and export boundary." >&2
   exit 1
 fi
 
@@ -148,8 +157,10 @@ fi
 if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "readTypes: dataToRead" "$VIEW" ||
   ! grep -Fq "func exportPayload(steps: [Steps]) -> [AnyObject]" "$VIEW" ||
-  ! grep -Fq "HealthKitExportMaxRows = 31" "$VIEW" ||
-  ! grep -Fq "inspectedRows >= HealthKitExportMaxRows" "$VIEW" ||
+  ! grep -Fq "HealthKitExportLookbackDays = 30" "$VIEW" ||
+  ! grep -Fq "inspectedRows >= HealthKitExportLookbackDays" "$VIEW" ||
+  ! grep -Fq "dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays" "$VIEW" ||
+  grep -Fq "dateByAddingUnit(.CalendarUnitMonth, value: -1" "$VIEW" ||
   ! grep -Fq "func validExportField(value: String) -> String?" "$VIEW" ||
   ! grep -Fq "stringByTrimmingCharactersInSet" "$VIEW" ||
   ! grep -Fq "self.outData.isEmpty" "$VIEW" ||
@@ -215,13 +226,14 @@ if -1 in (payload_limit, body_assignment, request_start) or not (
     print("HealthKit payload size must be checked before assigning or sending the request body.", file=sys.stderr)
     raise SystemExit(1)
 
-row_limit = view.find("inspectedRows >= HealthKitExportMaxRows")
+row_limit = view.find("inspectedRows >= HealthKitExportLookbackDays")
+query_limit = view.find("dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays")
 field_validation = view.find("if let date = validExportField(item.date)")
 payload_append = view.find('json.append(["date": date, "value": value])')
-if -1 in (row_limit, field_validation, payload_append) or not (
+if -1 in (row_limit, query_limit, field_validation, payload_append) or not (
     row_limit < field_validation < payload_append
 ):
-    print("HealthKit row limit must be enforced before validating and appending export rows.", file=sys.stderr)
+    print("HealthKit query and row limits must share the exact 30-day scope before export append.", file=sys.stderr)
     raise SystemExit(1)
 PY
 
@@ -338,6 +350,13 @@ fi
 if ! grep -Fq "Status: Completed" "$EXPORT_BOUNDS_PLAN" ||
   ! grep -Fq "make check" "$EXPORT_BOUNDS_PLAN"; then
   printf '%s\n' "HealthKit export volume plan must remain completed with verification recorded." >&2
+  exit 1
+fi
+
+if ! grep -Fq "Status: Completed" "$EXACT_SCOPE_PLAN" ||
+  ! grep -Fq "27391707339" "$EXACT_SCOPE_PLAN" ||
+  ! grep -Fq "27391708457" "$EXACT_SCOPE_PLAN"; then
+  printf '%s\n' "Exact 30-day scope plan must remain completed with hosted verification recorded." >&2
   exit 1
 fi
 
