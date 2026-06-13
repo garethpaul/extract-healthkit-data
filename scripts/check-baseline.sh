@@ -23,6 +23,7 @@ EXACT_SCOPE_PLAN="$ROOT_DIR/docs/plans/2026-06-12-healthkit-exact-30-day-scope.m
 CHECKOUT_CREDENTIAL_PLAN="$ROOT_DIR/docs/plans/2026-06-12-checkout-credential-boundary.md"
 REQUEST_PRIVACY_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-request-privacy.md"
 MANUAL_VERIFICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-manual-verification.md"
+SINGLE_PUBLICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-single-ui-publication.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -65,10 +66,52 @@ for path in \
   "docs/plans/2026-06-12-checkout-credential-boundary.md" \
   "docs/plans/2026-06-13-healthkit-request-privacy.md" \
   "docs/plans/2026-06-13-healthkit-manual-verification.md" \
+  "docs/plans/2026-06-13-healthkit-single-ui-publication.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
 done
+
+python3 - "$VIEW" <<'PY'
+import pathlib
+import sys
+
+source = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+sort_array = source.split("    func sortArray()", 1)[1].split("    func tableView", 1)[0]
+query_handler = source.split("        query.initialResultsHandler =", 1)[1].split(
+    "        theHealthStore.executeQuery(query)", 1
+)[0]
+
+dispatch = "dispatch_async(dispatch_get_main_queue()"
+assignment = "self.tableData = self.outData.reverse()"
+reload = "self.tableView.reloadData()"
+if any(sort_array.count(contract) != 1 for contract in (dispatch, assignment, reload)):
+    raise SystemExit("HealthKit UI publication calls must remain unique in sortArray.")
+if not sort_array.index(dispatch) < sort_array.index(assignment) < sort_array.index(reload):
+    raise SystemExit("HealthKit table data and reload must publish together on the main queue.")
+if "tableData = outData.reverse()" in sort_array:
+    raise SystemExit("HealthKit table data must not mutate before the main-queue block.")
+if query_handler.count("self.sortArray()") != 1:
+    raise SystemExit("HealthKit query results must publish exactly once.")
+if "            }\n\n            self.sortArray()" not in query_handler:
+    raise SystemExit("HealthKit query results must publish after statistics enumeration completes.")
+PY
+
+if ! grep -Fq "status: completed" "$SINGLE_PUBLICATION_PLAN" ||
+  ! grep -Fq "hostile mutations were rejected" "$SINGLE_PUBLICATION_PLAN" ||
+  ! grep -Fq "not performed locally" "$SINGLE_PUBLICATION_PLAN" ||
+  ! grep -Fq "hosted macOS" "$SINGLE_PUBLICATION_PLAN"; then
+  printf '%s\n' "HealthKit single-publication plan must record truthful completed evidence." >&2
+  exit 1
+fi
+
+if ! grep -Fq "statistics are published to the table once" "$README" ||
+  ! grep -Fq "table together on the main queue" "$ROOT_DIR/SECURITY.md" ||
+  ! grep -Fq "publish one complete table snapshot" "$VISION" ||
+  ! grep -Fq "Published each completed HealthKit statistics result" "$ROOT_DIR/CHANGES.md"; then
+  printf '%s\n' "Project docs must preserve the HealthKit single-publication boundary." >&2
+  exit 1
+fi
 
 workflow_count=$(find "$ROOT_DIR/.github/workflows" -type f \( -name '*.yml' -o -name '*.yaml' \) | wc -l | tr -d ' ')
 checkout_count=$(grep -Ec '^[[:space:]]*-[[:space:]]*uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10' "$CI_WORKFLOW" || true)

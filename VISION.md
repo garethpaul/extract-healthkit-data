@@ -48,6 +48,8 @@ Current baseline:
   signing certificates, certificate requests, app archives, and archive
   intermediates out of source control.
 - HealthKit query errors no longer abort the app.
+- HealthKit statistics publish one complete table snapshot on the main queue
+  after enumeration, avoiding per-row UI reloads.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
   fixed macOS runner with a credential-free checkout before review.
 - A physical-device checklist now covers read-only authorization, exact 30-day

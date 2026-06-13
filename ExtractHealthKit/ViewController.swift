@@ -76,8 +76,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func sortArray() {
-        tableData = outData.reverse()
         dispatch_async(dispatch_get_main_queue(), {
+            self.tableData = self.outData.reverse()
             self.tableView.reloadData()
             return
         })
@@ -181,8 +181,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     self.outData.append(Steps(date: s, value: val))
                 }
                 
-                self.sortArray()
             }
+
+            self.sortArray()
             
         }
 

@@ -75,6 +75,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   `Cache-Control: no-store` before serializing or sending HealthKit data.
 - HealthKit authorization and query failures use generic log messages instead
   of raw HealthKit error descriptions.
+- Completed HealthKit statistics are published to the table once, with both the
+  backing array assignment and reload performed on the main queue.
 
 ## Testing and Verification
 
@@ -158,6 +160,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   isolation and non-storage request controls.
 - See `docs/manual-healthkit-verification.md` for the physical-device
   authorization, confirmation, export, privacy, and redacted-evidence checklist.
+- See `docs/plans/2026-06-13-healthkit-single-ui-publication.md` for the
+  single main-queue table publication boundary.
 
 ## Contributing
 
