@@ -91,6 +91,9 @@ make check
 entitlement metadata, Podfile lock versions, and Xcode project settings. When
 `xcodebuild` is available, it also checks that Xcode can parse the project.
 
+The same gate can run through an absolute Makefile path from another working
+directory: `make -f /path/to/extract-healthkit-data/Makefile check`.
+
 GitHub Actions runs `make check` on a fixed `macos-15` runner for pushes, pull
 requests, and manual dispatches. The job pins checkout by commit, uses read-only
 repository permissions, does not persist the checkout credential, and exercises

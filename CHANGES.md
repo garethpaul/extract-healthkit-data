@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+- Made Make verification independent of the caller's working directory.
 - Selected the newest 30 collected HealthKit daily buckets for export while
   preserving chronological payload order when the query yields 31 boundaries.
 - Published each completed HealthKit statistics result to the table once on the

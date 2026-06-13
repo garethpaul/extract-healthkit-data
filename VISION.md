@@ -24,6 +24,8 @@ Priority:
 
 Current baseline:
 
+- Make verification resolves repository paths independently of the caller's
+  working directory.
 - `scripts/check-baseline.sh` validates privacy-sensitive source invariants,
   HealthKit plist and entitlement metadata, locked CocoaPods versions, and Xcode
   project settings.
