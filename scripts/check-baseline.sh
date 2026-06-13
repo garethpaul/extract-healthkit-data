@@ -24,6 +24,7 @@ CHECKOUT_CREDENTIAL_PLAN="$ROOT_DIR/docs/plans/2026-06-12-checkout-credential-bo
 REQUEST_PRIVACY_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-request-privacy.md"
 MANUAL_VERIFICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-manual-verification.md"
 SINGLE_PUBLICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-single-ui-publication.md"
+LATEST_EXPORT_WINDOW_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-latest-export-window.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -67,6 +68,7 @@ for path in \
   "docs/plans/2026-06-13-healthkit-request-privacy.md" \
   "docs/plans/2026-06-13-healthkit-manual-verification.md" \
   "docs/plans/2026-06-13-healthkit-single-ui-publication.md" \
+  "docs/plans/2026-06-13-healthkit-latest-export-window.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -302,14 +304,27 @@ if -1 in (cookie_isolation, cache_control, json_validation, request_start) or no
     print("HealthKit request cookie and cache protections must precede serialization and dispatch.", file=sys.stderr)
     raise SystemExit(1)
 
+latest_first = view.find("for item in steps.reverse()")
 row_limit = view.find("inspectedRows >= HealthKitExportLookbackDays")
 query_limit = view.find("dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays")
 field_validation = view.find("if let date = validExportField(item.date)")
 payload_append = view.find('json.append(["date": date, "value": value])')
-if -1 in (row_limit, query_limit, field_validation, payload_append) or not (
-    row_limit < field_validation < payload_append
+chronological_return = view.find("return json.reverse()")
+if -1 in (latest_first, row_limit, query_limit, field_validation, payload_append, chronological_return) or not (
+    latest_first < row_limit < field_validation < payload_append < chronological_return
 ):
-    print("HealthKit query and row limits must share the exact 30-day scope before export append.", file=sys.stderr)
+    print("HealthKit export must select the newest bounded window and restore chronological order.", file=sys.stderr)
+    raise SystemExit(1)
+
+if view.count("for item in steps.reverse()") != 1 or view.count("return json.reverse()") != 1:
+    print("HealthKit latest-window ordering contracts must remain unique.", file=sys.stderr)
+    raise SystemExit(1)
+
+fixture = ["day-%02d" % index for index in range(31)]
+selected = list(reversed(fixture))[:30]
+payload = list(reversed(selected))
+if payload != fixture[1:] or fixture[0] in payload or fixture[-1] not in payload:
+    print("HealthKit 31-bucket latest-window fixture failed.", file=sys.stderr)
     raise SystemExit(1)
 PY
 
@@ -439,6 +454,28 @@ if ! grep -Fq "Status: Completed" "$EXACT_SCOPE_PLAN" ||
   ! grep -Fq "27391707339" "$EXACT_SCOPE_PLAN" ||
   ! grep -Fq "27391708457" "$EXACT_SCOPE_PLAN"; then
   printf '%s\n' "Exact 30-day scope plan must remain completed with hosted verification recorded." >&2
+  exit 1
+fi
+
+for latest_window_contract in \
+  "status: completed" \
+  "## Status: Completed" \
+  "focused latest-window source and 31-bucket fixture contract passed" \
+  "make build" \
+  "Six isolated hostile mutations were rejected" \
+  "live HTTPS export were unavailable and are not claimed"; do
+  if ! grep -Fq "$latest_window_contract" "$LATEST_EXPORT_WINDOW_PLAN"; then
+    printf '%s\n' "Latest HealthKit export-window plan must record completed verification: $latest_window_contract" >&2
+    exit 1
+  fi
+done
+
+if ! grep -Fq "selects the newest 30 daily buckets" "$README" ||
+  ! grep -Fq "newest 30 daily buckets while preserving" "$ROOT_DIR/SECURITY.md" ||
+  ! grep -Fq "selecting the newest 30 daily buckets" "$VISION" ||
+  ! grep -Fq "Selected the newest 30 collected HealthKit daily buckets" "$ROOT_DIR/CHANGES.md" ||
+  ! grep -Fq "select the newest 30 daily buckets" "$ROOT_DIR/AGENTS.md"; then
+  printf '%s\n' "Latest HealthKit export-window documentation must remain synchronized." >&2
   exit 1
 fi
 

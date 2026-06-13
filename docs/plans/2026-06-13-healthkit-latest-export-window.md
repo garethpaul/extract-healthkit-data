@@ -2,11 +2,13 @@
 title: HealthKit Latest Export Window
 type: privacy
 date: 2026-06-13
-status: planned
+status: completed
 execution: code
 ---
 
 # HealthKit Latest Export Window
+
+## Status: Completed
 
 ## Summary
 
@@ -48,3 +50,25 @@ last 30 days.
 - Changing HealthKit authorization, query dates, endpoint configuration,
   payload fields, UI publication, or network response handling.
 - Modernizing the legacy Swift project or vendored networking code.
+
+## Work Completed
+
+- Iterated over collected daily buckets newest-first so the bounded inspection
+  retains the newest 30 when 31 query boundaries are present.
+- Reversed the accepted rows before returning the payload so network JSON stays
+  chronological.
+- Added source-order, uniqueness, and synthetic 31-bucket fixture contracts.
+- Synchronized contributor, privacy, vision, change, and usage guidance.
+
+## Verification Completed
+
+- The focused latest-window source and 31-bucket fixture contract passed.
+- `make check`, `make lint`, `make test`, and `make build` passed the maintained
+  privacy baseline on Linux.
+- `sh -n scripts/check-baseline.sh`, plist parsing, and `git diff --check`
+  passed.
+- Six isolated hostile mutations were rejected: oldest-first truncation,
+  missing chronological restoration, a weakened 30-bucket fixture, a 31-day
+  scope constant, stale plan status, and missing mutation evidence.
+- Local `xcodebuild`, signed HealthKit authorization, device UI interaction,
+  and live HTTPS export were unavailable and are not claimed.
