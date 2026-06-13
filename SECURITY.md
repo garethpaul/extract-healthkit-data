@@ -44,12 +44,15 @@ Helpful reports include:
   and skip network handling if filtering leaves no rows.
 - HealthKit export requests should use a bounded timeout before network
   handling.
+- HealthKit export requests should disable cookie handling and declare Cache-Control: no-store
+  before serialization and network handling.
 - HealthKit queries and export should share an exact 30-day limit, inspect at
   most 30 daily rows, and reject encoded payloads over 64 KiB before assigning
   an HTTP body or starting network handling.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
-  fixed macOS runner with pinned checkout, read-only repository access, and a
-  bounded runtime. Hosted checks must not use real HealthKit records or private
+  fixed macOS runner with pinned checkout, read-only repository access, a
+  credential-free checkout, and a bounded runtime. Hosted checks must not use
+  real HealthKit records or private
   endpoint values.
 
 ## Mobile Privacy Notes

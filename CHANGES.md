@@ -1,7 +1,14 @@
 # Changes
 
+## 2026-06-13
+
+- Disabled cookie handling and added Cache-Control: no-store before HealthKit
+  export serialization and request dispatch.
+
 ## 2026-06-12
 
+- Stopped the hosted macOS checkout from persisting its credential and added an
+  exact contract for the sole workflow and checkout step.
 - Replaced the variable-length one-calendar-month HealthKit query with an exact
   30-day lookback matching the export confirmation alert.
 - Reused the same 30-day constant as the maximum inspected export rows so data

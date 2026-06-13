@@ -71,6 +71,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Export requests are only serialized when the payload is one of Foundation's
   valid JSON objects.
 - Export requests use a bounded timeout before being handed to Alamofire.
+- Each export request disables shared HTTP cookie handling and declares
+  `Cache-Control: no-store` before serializing or sending HealthKit data.
 - HealthKit authorization and query failures use generic log messages instead
   of raw HealthKit error descriptions.
 
@@ -88,7 +90,8 @@ entitlement metadata, Podfile lock versions, and Xcode project settings. When
 
 GitHub Actions runs `make check` on a fixed `macos-15` runner for pushes, pull
 requests, and manual dispatches. The job pins checkout by commit, uses read-only
-repository permissions, and exercises the Xcode project parse without HealthKit
+repository permissions, does not persist the checkout credential, and exercises
+the Xcode project parse without HealthKit
 records, endpoint values, credentials, simulators, or devices.
 
 For full verification, run the app on a HealthKit-capable device with test data
@@ -148,6 +151,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   byte limits before HealthKit export.
 - See `docs/plans/2026-06-12-healthkit-exact-30-day-scope.md` for the shared
   query and export lookback boundary.
+- See `docs/plans/2026-06-13-healthkit-request-privacy.md` for outbound cookie
+  isolation and non-storage request controls.
 
 ## Contributing
 

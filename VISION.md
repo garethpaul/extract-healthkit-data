@@ -37,6 +37,8 @@ Current baseline:
   skips the network request if filtering leaves no rows.
 - Export serialization only runs for Foundation-valid JSON objects.
 - Export requests use a bounded timeout before Alamofire network handling.
+- Request cookie handling is disabled and export bodies are marked no-store
+  before Alamofire network handling.
 - HealthKit collection and export share an exact 30-day limit, with payloads
   capped at 30 inspected daily rows and 64 KiB of encoded JSON before network
   handling.
@@ -47,7 +49,7 @@ Current baseline:
   intermediates out of source control.
 - HealthKit query errors no longer abort the app.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
-  fixed macOS runner before review.
+  fixed macOS runner with a credential-free checkout before review.
 
 Next priorities:
 

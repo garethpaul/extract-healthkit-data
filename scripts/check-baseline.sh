@@ -20,6 +20,8 @@ EXPORT_TIMEOUT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-export-timeout.md
 CI_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-ci-baseline.md"
 EXPORT_BOUNDS_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-export-volume-bounds.md"
 EXACT_SCOPE_PLAN="$ROOT_DIR/docs/plans/2026-06-12-healthkit-exact-30-day-scope.md"
+CHECKOUT_CREDENTIAL_PLAN="$ROOT_DIR/docs/plans/2026-06-12-checkout-credential-boundary.md"
+REQUEST_PRIVACY_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-request-privacy.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
 require_file() {
@@ -57,10 +59,20 @@ for path in \
   "docs/plans/2026-06-10-healthkit-ci-baseline.md" \
   "docs/plans/2026-06-10-healthkit-export-volume-bounds.md" \
   "docs/plans/2026-06-12-healthkit-exact-30-day-scope.md" \
+  "docs/plans/2026-06-12-checkout-credential-boundary.md" \
+  "docs/plans/2026-06-13-healthkit-request-privacy.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
 done
+
+workflow_count=$(find "$ROOT_DIR/.github/workflows" -type f \( -name '*.yml' -o -name '*.yaml' \) | wc -l | tr -d ' ')
+checkout_count=$(grep -Ec '^[[:space:]]*-[[:space:]]*uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10' "$CI_WORKFLOW" || true)
+credential_boundary_count=$(grep -Ec '^[[:space:]]*persist-credentials:[[:space:]]*false([[:space:]]|$)' "$CI_WORKFLOW" || true)
+if [ "$workflow_count" -ne 1 ] || [ "$checkout_count" -ne 1 ] || [ "$credential_boundary_count" -ne 1 ]; then
+  printf '%s\n' "GitHub Actions must keep one workflow with one pinned, credential-free checkout." >&2
+  exit 1
+fi
 
 for workflow_contract in \
   "runs-on: macos-15" \
@@ -154,6 +166,12 @@ if ! grep -Fq "HealthKitExportEndpointKey" "$API" ||
   exit 1
 fi
 
+if [ "$(grep -Fc 'request.HTTPShouldHandleCookies = false' "$API")" -ne 1 ] ||
+  [ "$(grep -Fc 'request.setValue("no-store", forHTTPHeaderField: "Cache-Control")' "$API")" -ne 1 ]; then
+  printf '%s\n' "HealthKit export requests must disable cookies and set Cache-Control: no-store exactly once." >&2
+  exit 1
+fi
+
 if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "readTypes: dataToRead" "$VIEW" ||
   ! grep -Fq "func exportPayload(steps: [Steps]) -> [AnyObject]" "$VIEW" ||
@@ -224,6 +242,17 @@ if -1 in (payload_limit, body_assignment, request_start) or not (
     payload_limit < body_assignment < request_start
 ):
     print("HealthKit payload size must be checked before assigning or sending the request body.", file=sys.stderr)
+    raise SystemExit(1)
+
+cookie_isolation = api.find("request.HTTPShouldHandleCookies = false")
+cache_control = api.find('request.setValue("no-store", forHTTPHeaderField: "Cache-Control")')
+json_validation = api.find("NSJSONSerialization.isValidJSONObject(payload)")
+if -1 in (cookie_isolation, cache_control, json_validation, request_start) or not (
+    cookie_isolation < json_validation
+    and cache_control < json_validation
+    and json_validation < request_start
+):
+    print("HealthKit request cookie and cache protections must precede serialization and dispatch.", file=sys.stderr)
     raise SystemExit(1)
 
 row_limit = view.find("inspectedRows >= HealthKitExportLookbackDays")
@@ -347,6 +376,12 @@ if ! grep -Fq "Status: Completed" "$CI_PLAN" ||
   exit 1
 fi
 
+if ! grep -Fq "Status: Completed" "$CHECKOUT_CREDENTIAL_PLAN" ||
+  ! grep -Fq "make check" "$CHECKOUT_CREDENTIAL_PLAN"; then
+  printf '%s\n' "Checkout credential boundary plan must record completed make check verification." >&2
+  exit 1
+fi
+
 if ! grep -Fq "Status: Completed" "$EXPORT_BOUNDS_PLAN" ||
   ! grep -Fq "make check" "$EXPORT_BOUNDS_PLAN"; then
   printf '%s\n' "HealthKit export volume plan must remain completed with verification recorded." >&2
@@ -357,6 +392,23 @@ if ! grep -Fq "Status: Completed" "$EXACT_SCOPE_PLAN" ||
   ! grep -Fq "27391707339" "$EXACT_SCOPE_PLAN" ||
   ! grep -Fq "27391708457" "$EXACT_SCOPE_PLAN"; then
   printf '%s\n' "Exact 30-day scope plan must remain completed with hosted verification recorded." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$REQUEST_PRIVACY_PLAN" ||
+  ! grep -Fq "cookie isolation mutation failed" "$REQUEST_PRIVACY_PLAN" ||
+  ! grep -Fq "no-store mutation failed" "$REQUEST_PRIVACY_PLAN" ||
+  ! grep -Fq "ordering mutation failed" "$REQUEST_PRIVACY_PLAN" ||
+  ! grep -Fq "hosted macOS check" "$REQUEST_PRIVACY_PLAN"; then
+  printf '%s\n' "HealthKit request privacy plan must record completed local verification." >&2
+  exit 1
+fi
+
+if ! grep -Fq "disables shared HTTP cookie handling" "$README" ||
+  ! grep -Fq "disable cookie handling and declare Cache-Control: no-store" "$ROOT_DIR/SECURITY.md" ||
+  ! grep -Fq "Request cookie handling is disabled and export bodies are marked no-store" "$VISION" ||
+  ! grep -Fq "Disabled cookie handling and added Cache-Control: no-store" "$ROOT_DIR/CHANGES.md"; then
+  printf '%s\n' "Project guidance must document HealthKit request privacy isolation." >&2
   exit 1
 fi
 
