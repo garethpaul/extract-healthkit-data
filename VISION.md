@@ -50,13 +50,17 @@ Current baseline:
 - HealthKit query errors no longer abort the app.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
   fixed macOS runner with a credential-free checkout before review.
+- A physical-device checklist now covers read-only authorization, exact 30-day
+  confirmation, cancellation, controlled HTTPS export inspection, failures, and
+  redacted evidence without claiming that the checklist has been executed.
 
 Next priorities:
 
 - Verify the privacy baseline on a macOS/Xcode machine with a HealthKit-capable
   device
 - Modernize Swift, Alamofire, SwiftyJSON, and HealthKit APIs in a dedicated pass
-- Add tests or manual verification notes for authorization and export behavior
+- Add executable tests for authorization and export behavior where the legacy
+  toolchain permits reliable isolation
 
 Contribution rules:
 

@@ -1,7 +1,7 @@
 ---
 title: HealthKit Manual Authorization And Export Verification
 type: verification
-status: planned
+status: completed
 date: 2026-06-13
 ---
 
@@ -90,3 +90,28 @@ Files: `README.md`, `AGENTS.md`, `SECURITY.md`, `VISION.md`, `CHANGES.md`
 - Legacy Swift and CocoaPods versions may prevent a modern Xcode/device run.
 - Endpoint inspection can expose health data if the tester does not control and
   securely clean up the capture environment.
+
+## Verification
+
+- An isolated full `make check` passed with the completed plan contract enabled;
+  local `xcodebuild` was explicitly skipped because it is unavailable on Linux.
+- Ten isolated hostile mutations were rejected for weakened physical-device,
+  read-only authorization, exact 30-day consent, controlled endpoint, no-store,
+  cookie, redacted evidence, platform limitation, roadmap, and plan-status
+  requirements.
+- Shell syntax, plist parsing, `git diff --check`, exact eight-path review,
+  unchanged Swift/project/dependency/workflow inspection, signing and
+  credential-like addition inspection, and generated-artifact inspection passed.
+- The physical-device checklist remains unexecuted; no HealthKit records,
+  endpoint values, credentials, signing material, or network requests were used.
+- The exact pushed head still requires one bounded hosted macOS check snapshot;
+  hosted project parsing will remain separate from device-runtime evidence.
+
+## Work Completed
+
+- Added the manual authorization, query, consent, export, privacy, failure, and
+  evidence-recording checklist.
+- Added section-scoped maintenance contracts that normalize Markdown whitespace
+  without allowing unrelated repository prose to satisfy checklist assertions.
+- Updated contributor, security, roadmap, maintenance, and change guidance while
+  preserving the explicit unexecuted runtime status.

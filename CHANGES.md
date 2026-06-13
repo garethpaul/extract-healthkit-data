@@ -4,6 +4,9 @@
 
 - Disabled cookie handling and added Cache-Control: no-store before HealthKit
   export serialization and request dispatch.
+- Added a truthful physical-device checklist for read-only authorization,
+  exact 30-day consent, controlled export inspection, failures, and redacted
+  evidence; the checklist remains unexecuted in the Linux maintenance session.
 
 ## 2026-06-12
 
