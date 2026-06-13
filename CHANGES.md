@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Published each completed HealthKit statistics result to the table once on the
+  main queue instead of reloading for every enumerated day.
 - Disabled cookie handling and added Cache-Control: no-store before HealthKit
   export serialization and request dispatch.
 - Added a truthful physical-device checklist for read-only authorization,

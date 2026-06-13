@@ -40,6 +40,8 @@ Helpful reports include:
   handling.
 - HealthKit authorization and query failures should not log raw HealthKit error
   descriptions.
+- HealthKit query results should update the table backing array and reload the
+  table together on the main queue after statistics enumeration completes.
 - HealthKit export payloads should keep only rows with valid date/value fields
   and skip network handling if filtering leaves no rows.
 - HealthKit export requests should use a bounded timeout before network
