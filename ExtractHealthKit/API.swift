@@ -42,8 +42,10 @@ func postRequest(payload: AnyObject) -> Bool {
     if let url = exportEndpointURL() {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "POST"
+        request.HTTPShouldHandleCookies = false
         request.timeoutInterval = HealthKitExportTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
         if !NSJSONSerialization.isValidJSONObject(payload) {
             return false
         }

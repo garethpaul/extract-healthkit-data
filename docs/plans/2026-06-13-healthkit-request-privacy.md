@@ -1,7 +1,7 @@
 ---
 title: HealthKit Export Request Privacy
 type: privacy
-status: in_progress
+status: completed
 date: 2026-06-13
 ---
 
@@ -73,3 +73,24 @@ Files: `README.md`, `SECURITY.md`, `VISION.md`, `CHANGES.md`
 - Run shell syntax, plist parsing, `git diff --check`, and intended-file secret
   scans.
 - Take one bounded exact-head hosted check snapshot after push; do not poll.
+
+## Verification
+
+- A copied Linux privacy gate passed before hostile mutation testing; local
+  `xcodebuild` remained unavailable.
+- Removing `HTTPShouldHandleCookies = false` produced the expected `cookie isolation mutation failed` result.
+- Replacing `Cache-Control: no-store` produced the expected `no-store mutation failed` result.
+- Moving both protections after `Alamofire.request` produced the expected `ordering mutation failed` result.
+- The rooted full gate, shell syntax, plist parsing, diff check, and intended-file
+  secret scan passed.
+- The exact pushed head still requires the bounded hosted macOS check because
+  Swift compilation and device export cannot run on this Linux host.
+
+## Work Completed
+
+- Disabled automatic HTTP cookie handling on each HealthKit export request.
+- Added an exact `Cache-Control: no-store` request header before serialization.
+- Added exact-count and pre-dispatch ordering contracts to the privacy baseline.
+- Updated project privacy, security, maintenance, and change guidance.
+- Replayed the exact checkout credential boundary patch from source commit
+  `81be4271080540403fd5f1f0dbfba3c4b2a9c9ea`; PR #3 remains open and unchanged.

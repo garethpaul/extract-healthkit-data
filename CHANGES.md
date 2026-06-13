@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-13
+
+- Disabled cookie handling and added Cache-Control: no-store before HealthKit
+  export serialization and request dispatch.
+
 ## 2026-06-12
 
 - Stopped the hosted macOS checkout from persisting its credential and added an
