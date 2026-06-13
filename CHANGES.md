@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Selected the newest 30 collected HealthKit daily buckets for export while
+  preserving chronological payload order when the query yields 31 boundaries.
 - Published each completed HealthKit statistics result to the table once on the
   main queue instead of reloading for every enumerated day.
 - Disabled cookie handling and added Cache-Control: no-store before HealthKit

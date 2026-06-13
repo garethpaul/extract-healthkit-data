@@ -48,9 +48,10 @@ Helpful reports include:
   handling.
 - HealthKit export requests should disable cookie handling and declare Cache-Control: no-store
   before serialization and network handling.
-- HealthKit queries and export should share an exact 30-day limit, inspect at
-  most 30 daily rows, and reject encoded payloads over 64 KiB before assigning
-  an HTTP body or starting network handling.
+- HealthKit queries and export should share an exact 30-day limit, select the
+  newest 30 daily buckets while preserving chronological payload order, and
+  reject encoded payloads over 64 KiB before assigning an HTTP body or starting
+  network handling.
 - Runtime privacy claims require the physical-device checklist in
   `docs/manual-healthkit-verification.md`, tester-owned data, and a controlled
   HTTPS endpoint. Static checks and hosted project parsing are not evidence that

@@ -66,8 +66,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Export payload construction keeps only rows with valid date/value fields and
   skips the network request if filtering leaves no rows.
 - The HealthKit query uses an exact 30-day lookback, and export construction
-  inspects at most the same 30 daily rows before rejecting encoded JSON larger
-  than 64 KiB or handing data to network code.
+  selects the newest 30 daily buckets while preserving chronological payload
+  order before rejecting encoded JSON larger than 64 KiB or handing data to
+  network code.
 - Export requests are only serialized when the payload is one of Foundation's
   valid JSON objects.
 - Export requests use a bounded timeout before being handed to Alamofire.
@@ -156,6 +157,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   byte limits before HealthKit export.
 - See `docs/plans/2026-06-12-healthkit-exact-30-day-scope.md` for the shared
   query and export lookback boundary.
+- See `docs/plans/2026-06-13-healthkit-latest-export-window.md` for newest-window
+  selection and chronological payload ordering.
 - See `docs/plans/2026-06-13-healthkit-request-privacy.md` for outbound cookie
   isolation and non-storage request controls.
 - See `docs/manual-healthkit-verification.md` for the physical-device

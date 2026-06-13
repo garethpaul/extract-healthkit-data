@@ -40,8 +40,8 @@ Current baseline:
 - Request cookie handling is disabled and export bodies are marked no-store
   before Alamofire network handling.
 - HealthKit collection and export share an exact 30-day limit, with payloads
-  capped at 30 inspected daily rows and 64 KiB of encoded JSON before network
-  handling.
+  selecting the newest 30 daily buckets in chronological order and remaining
+  below 64 KiB of encoded JSON before network handling.
 - HealthKit failure logging uses generic messages instead of raw HealthKit
   error descriptions.
 - `.gitignore` and the static baseline keep local provisioning profiles,

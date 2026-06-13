@@ -22,7 +22,7 @@ func validExportField(value: String) -> String? {
 func exportPayload(steps: [Steps]) -> [AnyObject] {
     var json = [AnyObject]()
     var inspectedRows = 0
-    for item in steps {
+    for item in steps.reverse() {
         if inspectedRows >= HealthKitExportLookbackDays {
             break
         }
@@ -33,7 +33,7 @@ func exportPayload(steps: [Steps]) -> [AnyObject] {
             }
         }
     }
-    return json
+    return json.reverse()
 }
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
