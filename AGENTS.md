@@ -19,6 +19,7 @@
 
 - Install dependencies: `pod install`
 - Full baseline: `make check`
+- External baseline: `make -f /absolute/path/to/Makefile check`
 - Lint/static checks: `make lint`
 - Tests: `make test`
 - Build: `make build`

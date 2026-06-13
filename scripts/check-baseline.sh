@@ -25,6 +25,7 @@ REQUEST_PRIVACY_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-request-privacy.
 MANUAL_VERIFICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-manual-verification.md"
 SINGLE_PUBLICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-single-ui-publication.md"
 LATEST_EXPORT_WINDOW_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-latest-export-window.md"
+LOCATION_INDEPENDENT_MAKE_PLAN="$ROOT_DIR/docs/plans/2026-06-13-location-independent-make.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -69,10 +70,33 @@ for path in \
   "docs/plans/2026-06-13-healthkit-manual-verification.md" \
   "docs/plans/2026-06-13-healthkit-single-ui-publication.md" \
   "docs/plans/2026-06-13-healthkit-latest-export-window.md" \
+  "docs/plans/2026-06-13-location-independent-make.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
 done
+
+if ! grep -Fq 'ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))' "$ROOT_DIR/Makefile" ||
+  ! grep -Fq 'XCODEBUILD ?= xcodebuild' "$ROOT_DIR/Makefile" ||
+  ! grep -Fq '"$(ROOT)/scripts/check-baseline.sh"' "$ROOT_DIR/Makefile" ||
+  ! grep -Fq '$(XCODEBUILD) -list -project "$(ROOT)/ExtractHealthKit.xcodeproj"' "$ROOT_DIR/Makefile"; then
+  printf '%s\n' "Makefile checks must resolve privacy and Xcode project paths from the loaded Makefile." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$LOCATION_INDEPENDENT_MAKE_PLAN" ||
+  ! grep -Fq "from /tmp" "$LOCATION_INDEPENDENT_MAKE_PLAN"; then
+  printf '%s\n' "Location-independent HealthKit plan must record completed external verification." >&2
+  exit 1
+fi
+
+if ! grep -Fq "absolute Makefile path" "$README" ||
+  ! grep -Fq "Make verification resolves repository paths" "$VISION" ||
+  ! grep -Fq "External baseline" "$ROOT_DIR/AGENTS.md" ||
+  ! grep -Fq "Made Make verification independent" "$ROOT_DIR/CHANGES.md"; then
+  printf '%s\n' "Project guidance must document location-independent HealthKit verification." >&2
+  exit 1
+fi
 
 python3 - "$VIEW" <<'PY'
 import pathlib
