@@ -49,6 +49,10 @@ Helpful reports include:
 - HealthKit queries and export should share an exact 30-day limit, inspect at
   most 30 daily rows, and reject encoded payloads over 64 KiB before assigning
   an HTTP body or starting network handling.
+- Runtime privacy claims require the physical-device checklist in
+  `docs/manual-healthkit-verification.md`, tester-owned data, and a controlled
+  HTTPS endpoint. Static checks and hosted project parsing are not evidence that
+  authorization, consent cancellation, cookie isolation, or export behavior ran.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
   fixed macOS runner with pinned checkout, read-only repository access, a
   credential-free checkout, and a bounded runtime. Hosted checks must not use

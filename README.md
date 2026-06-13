@@ -94,8 +94,11 @@ repository permissions, does not persist the checkout credential, and exercises
 the Xcode project parse without HealthKit
 records, endpoint values, credentials, simulators, or devices.
 
-For full verification, run the app on a HealthKit-capable device with test data
-you control.
+For full verification, follow
+[`docs/manual-healthkit-verification.md`](docs/manual-healthkit-verification.md)
+on a HealthKit-capable physical device with tester-owned data and a controlled
+HTTPS endpoint. The checklist is defined but has not been executed by the
+Linux maintenance session; hosted project parsing is not device-runtime proof.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 
@@ -153,6 +156,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   query and export lookback boundary.
 - See `docs/plans/2026-06-13-healthkit-request-privacy.md` for outbound cookie
   isolation and non-storage request controls.
+- See `docs/manual-healthkit-verification.md` for the physical-device
+  authorization, confirmation, export, privacy, and redacted-evidence checklist.
 
 ## Contributing
 

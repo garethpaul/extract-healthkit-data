@@ -22,6 +22,8 @@ EXPORT_BOUNDS_PLAN="$ROOT_DIR/docs/plans/2026-06-10-healthkit-export-volume-boun
 EXACT_SCOPE_PLAN="$ROOT_DIR/docs/plans/2026-06-12-healthkit-exact-30-day-scope.md"
 CHECKOUT_CREDENTIAL_PLAN="$ROOT_DIR/docs/plans/2026-06-12-checkout-credential-boundary.md"
 REQUEST_PRIVACY_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-request-privacy.md"
+MANUAL_VERIFICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-manual-verification.md"
+MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
 require_file() {
@@ -48,6 +50,7 @@ for path in \
   "ExtractHealthKit/API.swift" \
   "ExtractHealthKit/ViewController.swift" \
   "ExtractHealthKit/Steps.swift" \
+  "docs/manual-healthkit-verification.md" \
   "docs/plans/2026-06-09-healthkit-empty-export-guard.md" \
   "docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md" \
   "docs/plans/2026-06-09-healthkit-endpoint-query-fragment-guard.md" \
@@ -61,6 +64,7 @@ for path in \
   "docs/plans/2026-06-12-healthkit-exact-30-day-scope.md" \
   "docs/plans/2026-06-12-checkout-credential-boundary.md" \
   "docs/plans/2026-06-13-healthkit-request-privacy.md" \
+  "docs/plans/2026-06-13-healthkit-manual-verification.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -409,6 +413,93 @@ if ! grep -Fq "disables shared HTTP cookie handling" "$README" ||
   ! grep -Fq "Request cookie handling is disabled and export bodies are marked no-store" "$VISION" ||
   ! grep -Fq "Disabled cookie handling and added Cache-Control: no-store" "$ROOT_DIR/CHANGES.md"; then
   printf '%s\n' "Project guidance must document HealthKit request privacy isolation." >&2
+  exit 1
+fi
+
+python3 - "$MANUAL_VERIFICATION" <<'PY'
+import sys
+from pathlib import Path
+
+source = Path(sys.argv[1]).read_text(encoding="utf-8")
+required_sections = {
+    "Status And Scope": [
+        "was not executed during the Linux maintenance session",
+        "Static Linux checks and hosted Xcode project parsing do not satisfy this run.",
+        "synthetic data or HealthKit records owned by the tester",
+    ],
+    "Prerequisites": [
+        "HealthKit-capable physical iPhone",
+        "simulator is not sufficient",
+        "controlled HTTPS endpoint owned by the tester",
+        "Never commit the configured endpoint.",
+    ],
+    "Authorization And Query": [
+        "read-only access to step count",
+        "does not request write access or unrelated HealthKit data",
+        "Deny step-count access",
+        "exact 30-day lookback",
+    ],
+    "Confirmation And Export": [
+        "last 30 days will be sent",
+        "Cancel the alert",
+        "exactly one POST",
+        "contains no credentials or unexpected health fields",
+        "64 KiB encoded-body limit",
+    ],
+    "Privacy And Failure Checks": [
+        "Content-Type: application/json",
+        "Cache-Control: no-store",
+        "no `Cookie` header",
+        "HealthKit export endpoint is not configured",
+        "does not log the request body, raw health records, credentials, or endpoint secrets",
+    ],
+    "Evidence Record": [
+        "commit SHA",
+        "physical device model",
+        "scrubbed of health data, endpoint values, credentials, device identifiers, and signing details",
+        "not proof of HealthKit authorization",
+    ],
+}
+
+sections = {}
+current = None
+for line in source.splitlines():
+    if line.startswith("## "):
+        current = line[3:]
+        sections[current] = []
+    elif current is not None:
+        sections[current].append(line)
+
+for heading, phrases in required_sections.items():
+    body = "\n".join(sections.get(heading, []))
+    if not body:
+        raise SystemExit("Manual HealthKit checklist section missing: " + heading)
+    normalized_body = " ".join(body.split())
+    for phrase in phrases:
+        if " ".join(phrase.split()) not in normalized_body:
+            raise SystemExit(
+                "Manual HealthKit checklist assertion missing from "
+                + heading
+                + ": "
+                + phrase
+            )
+PY
+
+if ! grep -Fq "status: completed" "$MANUAL_VERIFICATION_PLAN" ||
+  ! grep -Fq "hostile mutations were rejected" "$MANUAL_VERIFICATION_PLAN" ||
+  ! grep -Fq "physical-device checklist" "$MANUAL_VERIFICATION_PLAN" ||
+  ! grep -Fq "hosted macOS check" "$MANUAL_VERIFICATION_PLAN"; then
+  printf '%s\n' "HealthKit manual verification plan must record completed local verification." >&2
+  exit 1
+fi
+
+if ! grep -Fq "physical-device checklist" "$ROOT_DIR/SECURITY.md" ||
+  ! grep -Fq "checklist remains unexecuted" "$ROOT_DIR/CHANGES.md" ||
+  ! grep -Fq "without claiming that the checklist has been executed" "$VISION" ||
+  grep -Fq "Add tests or manual verification notes for authorization and export behavior" "$VISION" ||
+  ! grep -Fq "docs/manual-healthkit-verification.md" "$README" ||
+  ! grep -Fq "docs/manual-healthkit-verification.md" "$ROOT_DIR/AGENTS.md"; then
+  printf '%s\n' "Project guidance must preserve truthful HealthKit manual verification boundaries." >&2
   exit 1
 fi
 
