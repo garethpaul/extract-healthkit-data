@@ -209,8 +209,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
 
             // Construct HTTP Request
-            if !postRequest(json) {
-                println("HealthKit export endpoint is not configured.")
+            if !postRequest(json, completion: { succeeded in
+                if succeeded {
+                    println("HealthKit export completed.")
+                }
+                else {
+                    println("HealthKit export failed.")
+                }
+            }) {
+                println("HealthKit export request was not queued.")
             }
             
         }))

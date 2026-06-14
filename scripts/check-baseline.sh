@@ -27,6 +27,7 @@ SINGLE_PUBLICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-single-ui-pub
 LATEST_EXPORT_WINDOW_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-latest-export-window.md"
 LOCATION_INDEPENDENT_MAKE_PLAN="$ROOT_DIR/docs/plans/2026-06-13-location-independent-make.md"
 REDIRECT_BOUNDARY_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-redirect-boundary.md"
+EXPORT_RESPONSE_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-response-validation.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -73,6 +74,7 @@ for path in \
   "docs/plans/2026-06-13-healthkit-latest-export-window.md" \
   "docs/plans/2026-06-13-location-independent-make.md" \
   "docs/plans/2026-06-14-healthkit-export-redirect-boundary.md" \
+  "docs/plans/2026-06-14-healthkit-export-response-validation.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -263,7 +265,7 @@ if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "No valid HealthKit step data available to export." "$VIEW" ||
   ! grep -Fq "HealthKit authorization was not granted." "$VIEW" ||
   ! grep -Fq "HealthKit statistics query failed." "$VIEW" ||
-  ! grep -Fq "HealthKit export endpoint is not configured." "$VIEW"; then
+  ! grep -Fq "HealthKit export request was not queued." "$VIEW"; then
   printf '%s\n' "ViewController must keep read-only HealthKit authorization and explicit export failure handling." >&2
   exit 1
 fi
@@ -297,7 +299,7 @@ source = Path(sys.argv[1]).read_text(encoding="utf-8")
 empty_guard = source.find("self.outData.isEmpty")
 payload = source.find("let json = exportPayload(self.outData)")
 filtered_guard = source.find("json.isEmpty")
-post = source.find("postRequest(json)")
+post = source.find("postRequest(json, completion:")
 if -1 in (empty_guard, payload, filtered_guard, post) or not (empty_guard < payload < filtered_guard < post):
     print("HealthKit export must guard empty data before building, filter invalid rows, then post the payload.", file=sys.stderr)
     raise SystemExit(1)
@@ -331,6 +333,26 @@ if -1 in manager_positions or manager_positions != sorted(manager_positions):
 
 if "Alamofire.request(request)" in api:
     print("HealthKit export must not dispatch through Alamofire's shared request helper.", file=sys.stderr)
+    raise SystemExit(1)
+
+response_start = api.find("HealthKitExportManager.request(request).response")
+transport_check = api.find("if error == nil", response_start)
+status_unwrap = api.find("if let statusCode = response?.statusCode", response_start)
+success_range = api.find("statusCode >= 200 && statusCode < 300", response_start)
+completion = api.find("completion(succeeded)", response_start)
+if -1 in (response_start, transport_check, status_unwrap, success_range, completion) or not (
+    response_start < transport_check < status_unwrap < success_range < completion
+):
+    print("HealthKit export completion must require no transport error and an HTTP 2xx response.", file=sys.stderr)
+    raise SystemExit(1)
+
+view_contracts = [
+    'println("HealthKit export completed.")',
+    'println("HealthKit export failed.")',
+    'println("HealthKit export request was not queued.")',
+]
+if any(contract not in view for contract in view_contracts):
+    print("HealthKit export diagnostics must distinguish queueing and generic completion results.", file=sys.stderr)
     raise SystemExit(1)
 
 payload_limit = api.find("encodedBody.length > HealthKitExportMaxPayloadBytes")
@@ -559,6 +581,20 @@ for document in "$README" "$ROOT_DIR/SECURITY.md" "$VISION" "$ROOT_DIR/CHANGES.m
   fi
 done
 
+if ! grep -Fq "status: completed" "$EXPORT_RESPONSE_PLAN" ||
+  ! grep -Fq "make check" "$EXPORT_RESPONSE_PLAN" ||
+  ! grep -Fq "hostile mutations were rejected" "$EXPORT_RESPONSE_PLAN"; then
+  printf '%s\n' "HealthKit export response plan must record completed verification." >&2
+  exit 1
+fi
+
+for document in "$README" "$ROOT_DIR/SECURITY.md" "$VISION" "$ROOT_DIR/CHANGES.md" "$ROOT_DIR/AGENTS.md"; do
+  if ! grep -Fq "transport-error-free HTTP 2xx response" "$document"; then
+    printf '%s\n' "$document must document HealthKit export response validation." >&2
+    exit 1
+  fi
+done
+
 python3 - "$MANUAL_VERIFICATION" <<'PY'
 import sys
 from pathlib import Path
@@ -593,7 +629,9 @@ required_sections = {
         "Content-Type: application/json",
         "Cache-Control: no-store",
         "no `Cookie` header",
-        "HealthKit export endpoint is not configured",
+        "HealthKit export request was not queued",
+        "transport-error-free HTTP 2xx response",
+        "controlled non-2xx response",
         "does not log the request body, raw health records, credentials, or endpoint secrets",
     ],
     "Evidence Record": [

@@ -43,6 +43,9 @@ Current baseline:
   before Alamofire network handling.
 - A dedicated ephemeral export session rejects HTTP redirects after endpoint
   validation.
+- Queued exports report completion only after a transport-error-free HTTP 2xx response,
+  with generic diagnostics that omit response bodies, endpoint
+  details, payloads, status text, and raw errors.
 - HealthKit collection and export share an exact 30-day limit, with payloads
   selecting the newest 30 daily buckets in chronological order and remaining
   below 64 KiB of encoded JSON before network handling.

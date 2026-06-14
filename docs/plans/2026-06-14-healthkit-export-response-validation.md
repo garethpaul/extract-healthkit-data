@@ -2,7 +2,7 @@
 title: HealthKit Export Response Validation
 type: reliability
 date: 2026-06-14
-status: in-progress
+status: completed
 execution: code
 ---
 
@@ -44,4 +44,13 @@ success, without logging response bodies, endpoint details, or raw errors.
 
 ## Verification
 
-- Pending implementation and bounded validation.
+- The focused static preflight passed response-handler ordering, generic
+  diagnostics, privacy, and manual-checklist contracts before stopping only at
+  the intentionally pending completed-plan gate.
+- Full `make check` passes from the repository and from `/tmp` through the
+  absolute Makefile path; Xcode compilation is not claimed on Linux.
+- Six isolated hostile mutations were rejected across response attachment,
+  transport error handling, HTTP status range, completion ordering, generic
+  diagnostics, and completed-plan evidence.
+- Exact intended-path, artifact, whitespace, conflict-marker, and changed-line
+  credential-pattern audits pass before delivery.

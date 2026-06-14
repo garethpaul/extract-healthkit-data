@@ -46,7 +46,7 @@ func exportEndpointURL() -> NSURL? {
     return nil
 }
 
-func postRequest(payload: AnyObject) -> Bool {
+func postRequest(payload: AnyObject, completion: (Bool) -> Void) -> Bool {
 
     if let url = exportEndpointURL() {
         let request = NSMutableURLRequest(URL: url)
@@ -69,7 +69,15 @@ func postRequest(payload: AnyObject) -> Bool {
             }
             request.HTTPBody = encodedBody
         }
-        HealthKitExportManager.request(request)
+        HealthKitExportManager.request(request).response { (_, response, _, error) in
+            var succeeded = false
+            if error == nil {
+                if let statusCode = response?.statusCode {
+                    succeeded = statusCode >= 200 && statusCode < 300
+                }
+            }
+            completion(succeeded)
+        }
         return true
     }
 
