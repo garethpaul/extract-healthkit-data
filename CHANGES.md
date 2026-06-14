@@ -1,5 +1,9 @@
 # Changes
 
+## 2026-06-14
+
+- Added a dedicated ephemeral HealthKit export manager that rejects HTTP redirects.
+
 ## 2026-06-13
 
 - Made Make verification independent of the caller's working directory.

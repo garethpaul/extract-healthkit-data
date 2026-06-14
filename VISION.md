@@ -41,6 +41,8 @@ Current baseline:
 - Export requests use a bounded timeout before Alamofire network handling.
 - Request cookie handling is disabled and export bodies are marked no-store
   before Alamofire network handling.
+- A dedicated ephemeral export session rejects HTTP redirects after endpoint
+  validation.
 - HealthKit collection and export share an exact 30-day limit, with payloads
   selecting the newest 30 daily buckets in chronological order and remaining
   below 64 KiB of encoded JSON before network handling.

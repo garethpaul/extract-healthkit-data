@@ -74,6 +74,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Export requests use a bounded timeout before being handed to Alamofire.
 - Each export request disables shared HTTP cookie handling and declares
   `Cache-Control: no-store` before serializing or sending HealthKit data.
+- A dedicated ephemeral export session rejects HTTP redirects so validated
+  HealthKit payloads cannot be forwarded to another destination.
 - HealthKit authorization and query failures use generic log messages instead
   of raw HealthKit error descriptions.
 - Completed HealthKit statistics are published to the table once, with both the

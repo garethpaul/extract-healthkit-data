@@ -26,6 +26,7 @@ MANUAL_VERIFICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-manual-verif
 SINGLE_PUBLICATION_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-single-ui-publication.md"
 LATEST_EXPORT_WINDOW_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-latest-export-window.md"
 LOCATION_INDEPENDENT_MAKE_PLAN="$ROOT_DIR/docs/plans/2026-06-13-location-independent-make.md"
+REDIRECT_BOUNDARY_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-redirect-boundary.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -71,6 +72,7 @@ for path in \
   "docs/plans/2026-06-13-healthkit-single-ui-publication.md" \
   "docs/plans/2026-06-13-healthkit-latest-export-window.md" \
   "docs/plans/2026-06-13-location-independent-make.md" \
+  "docs/plans/2026-06-14-healthkit-export-redirect-boundary.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -308,9 +310,32 @@ from pathlib import Path
 api = Path(sys.argv[1]).read_text(encoding="utf-8")
 view = Path(sys.argv[2]).read_text(encoding="utf-8")
 
+manager_start = api.find("let HealthKitExportManager: Alamofire.Manager")
+manager_end = api.find("func exportEndpointURL()")
+if -1 in (manager_start, manager_end) or manager_start >= manager_end:
+    print("HealthKit export must define a dedicated manager before endpoint and request handling.", file=sys.stderr)
+    raise SystemExit(1)
+
+manager = api[manager_start:manager_end]
+manager_contract = [
+    "NSURLSessionConfiguration.ephemeralSessionConfiguration()",
+    "configuration.HTTPAdditionalHeaders = Alamofire.Manager.defaultHTTPHeaders",
+    "Alamofire.Manager(configuration: configuration)",
+    "manager.delegate.taskWillPerformHTTPRedirection",
+    "return nil",
+]
+manager_positions = [manager.find(contract) for contract in manager_contract]
+if -1 in manager_positions or manager_positions != sorted(manager_positions):
+    print("HealthKit export manager must reject redirects before requests are created.", file=sys.stderr)
+    raise SystemExit(1)
+
+if "Alamofire.request(request)" in api:
+    print("HealthKit export must not dispatch through Alamofire's shared request helper.", file=sys.stderr)
+    raise SystemExit(1)
+
 payload_limit = api.find("encodedBody.length > HealthKitExportMaxPayloadBytes")
 body_assignment = api.find("request.HTTPBody = encodedBody")
-request_start = api.find("Alamofire.request(request)")
+request_start = api.find("HealthKitExportManager.request(request)")
 if -1 in (payload_limit, body_assignment, request_start) or not (
     payload_limit < body_assignment < request_start
 ):
@@ -519,6 +544,20 @@ if ! grep -Fq "disables shared HTTP cookie handling" "$README" ||
   printf '%s\n' "Project guidance must document HealthKit request privacy isolation." >&2
   exit 1
 fi
+
+if ! grep -Fq "status: completed" "$REDIRECT_BOUNDARY_PLAN" ||
+  ! grep -Fq "make check" "$REDIRECT_BOUNDARY_PLAN" ||
+  ! grep -Fq "hostile mutations were rejected" "$REDIRECT_BOUNDARY_PLAN"; then
+  printf '%s\n' "HealthKit redirect boundary plan must record completed verification." >&2
+  exit 1
+fi
+
+for document in "$README" "$ROOT_DIR/SECURITY.md" "$VISION" "$ROOT_DIR/CHANGES.md" "$ROOT_DIR/AGENTS.md"; do
+  if ! grep -Fq "rejects HTTP redirects" "$document"; then
+    printf '%s\n' "$document must document that HealthKit export rejects HTTP redirects." >&2
+    exit 1
+  fi
+done
 
 python3 - "$MANUAL_VERIFICATION" <<'PY'
 import sys

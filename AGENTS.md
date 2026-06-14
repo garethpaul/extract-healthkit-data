@@ -53,6 +53,7 @@
 - Keep HealthKit authorization read-only and preserve the user confirmation before export. Authorization and query failures must use generic logs rather than raw HealthKit error descriptions.
 - Export only non-empty rows with valid trimmed `date` and `value` fields, skip requests when no valid rows remain, select the newest 30 daily buckets in chronological order, and reject encoded JSON larger than 64 KiB.
 - The export body must remain a Foundation-valid JSON object, use `application/json`, and apply the 30-second request timeout before Alamofire queues the request.
+- Use the dedicated ephemeral export manager that rejects HTTP redirects; do not dispatch HealthKit payloads through Alamofire's shared request helper.
 - Hosted macOS CI proves the Xcode project parses, not that the app builds, signs, receives HealthKit authorization, or successfully exports from a device.
 - Use `docs/manual-healthkit-verification.md` for physical-device verification. Keep its device, tester-owned data, controlled HTTPS endpoint, cancellation, request privacy, failure, and redacted-evidence requirements intact; do not mark it executed without a real Apple-platform run.
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
