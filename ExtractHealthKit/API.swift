@@ -12,6 +12,15 @@ import Alamofire
 let HealthKitExportEndpointKey = "HealthKitExportEndpoint"
 let HealthKitExportTimeout: NSTimeInterval = 30
 let HealthKitExportMaxPayloadBytes = 64 * 1024
+let HealthKitExportManager: Alamofire.Manager = {
+    let configuration = NSURLSessionConfiguration.ephemeralSessionConfiguration()
+    configuration.HTTPAdditionalHeaders = Alamofire.Manager.defaultHTTPHeaders
+    let manager = Alamofire.Manager(configuration: configuration)
+    manager.delegate.taskWillPerformHTTPRedirection = { _, _, _, _ in
+        return nil
+    }
+    return manager
+}()
 
 func exportEndpointURL() -> NSURL? {
     let endpoint = NSBundle.mainBundle().objectForInfoDictionaryKey(HealthKitExportEndpointKey) as? String
@@ -60,7 +69,7 @@ func postRequest(payload: AnyObject) -> Bool {
             }
             request.HTTPBody = encodedBody
         }
-        Alamofire.request(request)
+        HealthKitExportManager.request(request)
         return true
     }
 

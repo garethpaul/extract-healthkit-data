@@ -1,7 +1,7 @@
 ---
 title: HealthKit Export Redirect Boundary
 type: privacy
-status: planned
+status: completed
 date: 2026-06-14
 ---
 
@@ -45,13 +45,22 @@ every redirect before any request is created.
 - Claiming live device behavior without hosted Xcode validation and a
   controlled redirecting endpoint.
 
-## Planned Verification
+## Verification
 
-- Run the full static `make check` gate from the repository and from `/tmp`.
-- Reject isolated hostile mutations for shared-manager dispatch, missing
-  redirect denial, redirect acceptance, ordering, documentation, and completed
-  plan evidence.
-- Run shell syntax, plist parsing, exact diff, generated-artifact,
-  conflict-marker, and changed-line credential-pattern audits.
-- Take one bounded exact-head hosted PR/check and code-scanning snapshot after
-  push; do not poll or wait on pending jobs.
+- The focused redirect source-order contract and shell syntax check passed.
+- A completed-plan baseline preflight passed.
+- Six isolated hostile mutations were rejected for shared-manager dispatch,
+  missing redirect denial, redirect acceptance, manager ordering,
+  documentation, and completed plan evidence.
+- `make check` passed from the repository and from `/tmp` through the absolute
+  Makefile path. Both runs truthfully skipped `xcodebuild` because it is not
+  installed on the Linux host.
+- Shell syntax, both plist parses, exact intended-path review, unchanged
+  project/dependency/workflow inspection, generated-artifact, untracked-file,
+  conflict-marker, whitespace, and changed-line credential-pattern audits
+  passed.
+- Sequential security, correctness, maintainability, and test review found no
+  actionable issue; Alamofire 1.2.2's source and README confirm the dedicated
+  manager and redirect delegate APIs used by the implementation.
+- One bounded exact-head hosted PR/check and code-scanning snapshot is required
+  after push; pending jobs will not be polled or awaited.

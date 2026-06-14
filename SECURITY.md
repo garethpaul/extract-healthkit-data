@@ -48,6 +48,8 @@ Helpful reports include:
   handling.
 - HealthKit export requests should disable cookie handling and declare Cache-Control: no-store
   before serialization and network handling.
+- The dedicated ephemeral HealthKit export session rejects HTTP redirects so
+  endpoint validation cannot be bypassed after request dispatch.
 - HealthKit queries and export should share an exact 30-day limit, select the
   newest 30 daily buckets while preserving chronological payload order, and
   reject encoded payloads over 64 KiB before assigning an HTTP body or starting
