@@ -3,6 +3,8 @@
 ## 2026-06-14
 
 - Added a dedicated ephemeral HealthKit export manager that rejects HTTP redirects.
+- Required a transport-error-free HTTP 2xx response before reporting a queued
+  HealthKit export as completed.
 
 ## 2026-06-13
 

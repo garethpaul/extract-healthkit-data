@@ -76,6 +76,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   `Cache-Control: no-store` before serializing or sending HealthKit data.
 - A dedicated ephemeral export session rejects HTTP redirects so validated
   HealthKit payloads cannot be forwarded to another destination.
+- A queued export is reported as completed only after a transport-error-free HTTP 2xx response;
+  failures use generic diagnostics without response bodies,
+  endpoint details, payloads, or raw errors.
 - HealthKit authorization and query failures use generic log messages instead
   of raw HealthKit error descriptions.
 - Completed HealthKit statistics are published to the table once, with both the
@@ -166,6 +169,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   selection and chronological payload ordering.
 - See `docs/plans/2026-06-13-healthkit-request-privacy.md` for outbound cookie
   isolation and non-storage request controls.
+- See `docs/plans/2026-06-14-healthkit-export-response-validation.md` for
+  transport and HTTP status validation after an export is queued.
 - See `docs/manual-healthkit-verification.md` for the physical-device
   authorization, confirmation, export, privacy, and redacted-evidence checklist.
 - See `docs/plans/2026-06-13-healthkit-single-ui-publication.md` for the

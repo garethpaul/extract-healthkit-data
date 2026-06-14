@@ -56,10 +56,13 @@ unredacted request bodies to an issue or pull request.
 - Inspect the confirmed request and verify `Content-Type: application/json`,
   `Cache-Control: no-store`, and no `Cookie` header.
 - Remove the local endpoint configuration and confirm the app reports that the
-  HealthKit export endpoint is not configured without exposing a private value.
-- Use a controlled failing endpoint and confirm the app remains responsive and
-  does not log the request body, raw health records, credentials, or endpoint
-  secrets.
+  HealthKit export request was not queued without exposing a private value.
+- Return a transport-error-free HTTP 2xx response and confirm the app reports
+  completion only after that response arrives.
+- Return a controlled non-2xx response, then exercise a transport failure;
+  confirm both report generic failure while the app remains responsive and does
+  not log the request body, raw health records, credentials, or endpoint secrets.
+  Confirm diagnostics also omit the response body, status text, and raw error.
 - Exercise denied authorization and a query failure where the test environment
   permits it; verify generic failure logs and no export request.
 - Clean up captured endpoint data, local endpoint configuration, derived logs,

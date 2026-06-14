@@ -50,6 +50,9 @@ Helpful reports include:
   before serialization and network handling.
 - The dedicated ephemeral HealthKit export session rejects HTTP redirects so
   endpoint validation cannot be bypassed after request dispatch.
+- A queued HealthKit export should report completion only after a
+  transport-error-free HTTP 2xx response; diagnostics must not include response
+  bodies, endpoint details, payloads, status text, or raw errors.
 - HealthKit queries and export should share an exact 30-day limit, select the
   newest 30 daily buckets while preserving chronological payload order, and
   reject encoded payloads over 64 KiB before assigning an HTTP body or starting
