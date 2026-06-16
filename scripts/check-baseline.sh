@@ -7,6 +7,9 @@ VISION="$ROOT_DIR/VISION.md"
 PROJECT="$ROOT_DIR/ExtractHealthKit.xcodeproj/project.pbxproj"
 API="$ROOT_DIR/ExtractHealthKit/API.swift"
 VIEW="$ROOT_DIR/ExtractHealthKit/ViewController.swift"
+EXPORT_POLICY="$ROOT_DIR/ExtractHealthKit/HealthKitExportPolicy.swift"
+EXPORT_POLICY_TESTS="$ROOT_DIR/Tests/HealthKitExportPolicyTests/main.swift"
+EXPORT_POLICY_RUNNER="$ROOT_DIR/scripts/run-healthkit-export-policy-tests.sh"
 PLAN="$ROOT_DIR/docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"
 ENDPOINT_PLAN="$ROOT_DIR/docs/plans/2026-06-08-healthkit-endpoint-host-validation.md"
 EMPTY_EXPORT_PLAN="$ROOT_DIR/docs/plans/2026-06-09-healthkit-empty-export-guard.md"
@@ -28,6 +31,7 @@ LATEST_EXPORT_WINDOW_PLAN="$ROOT_DIR/docs/plans/2026-06-13-healthkit-latest-expo
 LOCATION_INDEPENDENT_MAKE_PLAN="$ROOT_DIR/docs/plans/2026-06-13-location-independent-make.md"
 REDIRECT_BOUNDARY_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-redirect-boundary.md"
 EXPORT_RESPONSE_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-response-validation.md"
+EXECUTABLE_EXPORT_POLICY_PLAN="$ROOT_DIR/docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -53,8 +57,11 @@ for path in \
   "ExtractHealthKit/Info.plist" \
   "ExtractHealthKit/ExtractHealthKit.entitlements" \
   "ExtractHealthKit/API.swift" \
+  "ExtractHealthKit/HealthKitExportPolicy.swift" \
   "ExtractHealthKit/ViewController.swift" \
   "ExtractHealthKit/Steps.swift" \
+  "Tests/HealthKitExportPolicyTests/main.swift" \
+  "scripts/run-healthkit-export-policy-tests.sh" \
   "docs/manual-healthkit-verification.md" \
   "docs/plans/2026-06-09-healthkit-empty-export-guard.md" \
   "docs/plans/2026-06-09-healthkit-endpoint-userinfo-guard.md" \
@@ -75,6 +82,7 @@ for path in \
   "docs/plans/2026-06-13-location-independent-make.md" \
   "docs/plans/2026-06-14-healthkit-export-redirect-boundary.md" \
   "docs/plans/2026-06-14-healthkit-export-response-validation.md" \
+  "docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -82,9 +90,18 @@ done
 
 if ! grep -Fq 'ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))' "$ROOT_DIR/Makefile" ||
   ! grep -Fq 'XCODEBUILD ?= xcodebuild' "$ROOT_DIR/Makefile" ||
+  ! grep -Fq 'SWIFTC ?= swiftc' "$ROOT_DIR/Makefile" ||
+  ! grep -Fq '"$(ROOT)/scripts/run-healthkit-export-policy-tests.sh"' "$ROOT_DIR/Makefile" ||
   ! grep -Fq '"$(ROOT)/scripts/check-baseline.sh"' "$ROOT_DIR/Makefile" ||
   ! grep -Fq '$(XCODEBUILD) -list -project "$(ROOT)/ExtractHealthKit.xcodeproj"' "$ROOT_DIR/Makefile"; then
   printf '%s\n' "Makefile checks must resolve privacy and Xcode project paths from the loaded Makefile." >&2
+  exit 1
+fi
+
+if ! grep -Fq "status: completed" "$EXECUTABLE_EXPORT_POLICY_PLAN" ||
+  ! grep -Fq "synthetic tuples" "$EXECUTABLE_EXPORT_POLICY_PLAN" ||
+  ! grep -Fq "does not prove HealthKit authorization" "$EXECUTABLE_EXPORT_POLICY_PLAN"; then
+  printf '%s\n' "Executable HealthKit export policy plan must record completed, bounded evidence." >&2
   exit 1
 fi
 
@@ -252,12 +269,9 @@ fi
 if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "readTypes: dataToRead" "$VIEW" ||
   ! grep -Fq "func exportPayload(steps: [Steps]) -> [AnyObject]" "$VIEW" ||
-  ! grep -Fq "HealthKitExportLookbackDays = 30" "$VIEW" ||
-  ! grep -Fq "inspectedRows >= HealthKitExportLookbackDays" "$VIEW" ||
+  ! grep -Fq "healthKitExportRows(rows)" "$VIEW" ||
   ! grep -Fq "dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays" "$VIEW" ||
   grep -Fq "dateByAddingUnit(.CalendarUnitMonth, value: -1" "$VIEW" ||
-  ! grep -Fq "func validExportField(value: String) -> String?" "$VIEW" ||
-  ! grep -Fq "stringByTrimmingCharactersInSet" "$VIEW" ||
   ! grep -Fq "self.outData.isEmpty" "$VIEW" ||
   ! grep -Fq "No HealthKit step data available to export." "$VIEW" ||
   ! grep -Fq "let json = exportPayload(self.outData)" "$VIEW" ||
@@ -267,6 +281,34 @@ if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "HealthKit statistics query failed." "$VIEW" ||
   ! grep -Fq "HealthKit export request was not queued." "$VIEW"; then
   printf '%s\n' "ViewController must keep read-only HealthKit authorization and explicit export failure handling." >&2
+  exit 1
+fi
+
+if ! grep -Fq "HealthKitExportLookbackDays = 30" "$EXPORT_POLICY" ||
+  ! grep -Fq "let healthKitValidExportField: (String) -> String?" "$EXPORT_POLICY" ||
+  ! grep -Fq "stringByTrimmingCharactersInSet" "$EXPORT_POLICY" ||
+  ! grep -Fq "trimmingCharacters(in: .whitespacesAndNewlines)" "$EXPORT_POLICY" ||
+  ! grep -Fq "let healthKitExportRows: ([(String, String)]) -> [(String, String)]" "$EXPORT_POLICY" ||
+  ! grep -Fq "inspectedRows >= HealthKitExportLookbackDays" "$EXPORT_POLICY" ||
+  ! grep -Fq "return Array(selected.reversed())" "$EXPORT_POLICY" ||
+  ! grep -Fq "return selected.reverse()" "$EXPORT_POLICY"; then
+  printf '%s\n' "HealthKit export policy must remain executable and compatible with the legacy app source." >&2
+  exit 1
+fi
+
+if [ ! -x "$EXPORT_POLICY_RUNNER" ] ||
+  ! grep -Fq -- "-D EXECUTABLE_POLICY_TESTS" "$EXPORT_POLICY_RUNNER" ||
+  ! grep -Fq 'HealthKitExportPolicy.swift' "$EXPORT_POLICY_RUNNER" ||
+  ! grep -Fq 'HealthKitExportPolicyTests/main.swift' "$EXPORT_POLICY_RUNNER" ||
+  ! grep -Fq 'expect(healthKitExportRows(syntheticRows(31)), Array(syntheticRows(31)[1...30]), "newest 30 rows")' "$EXPORT_POLICY_TESTS" ||
+  ! grep -Fq 'expect(healthKitExportRows(noBackfill), Array(syntheticRows(30)[1...29]), "invalid newest row does not backfill old data")' "$EXPORT_POLICY_TESTS"; then
+  printf '%s\n' "Executable HealthKit export policy tests must cover the newest bounded window and invalid-row behavior." >&2
+  exit 1
+fi
+
+if [ "$(grep -Fc 'HealthKitExportPolicy.swift in Sources' "$PROJECT")" -ne 2 ] ||
+  [ "$(grep -Fc 'HealthKitExportPolicy.swift */' "$PROJECT")" -lt 3 ]; then
+  printf '%s\n' "HealthKitExportPolicy.swift must be referenced once and included in the app Sources phase." >&2
   exit 1
 fi
 
@@ -305,12 +347,13 @@ if -1 in (empty_guard, payload, filtered_guard, post) or not (empty_guard < payl
     raise SystemExit(1)
 PY
 
-python3 - "$API" "$VIEW" <<'PY'
+python3 - "$API" "$VIEW" "$EXPORT_POLICY" <<'PY'
 import sys
 from pathlib import Path
 
 api = Path(sys.argv[1]).read_text(encoding="utf-8")
 view = Path(sys.argv[2]).read_text(encoding="utf-8")
+policy = Path(sys.argv[3]).read_text(encoding="utf-8")
 
 manager_start = api.find("let HealthKitExportManager: Alamofire.Manager")
 manager_end = api.find("func exportEndpointURL()")
@@ -375,19 +418,19 @@ if -1 in (cookie_isolation, cache_control, json_validation, request_start) or no
     print("HealthKit request cookie and cache protections must precede serialization and dispatch.", file=sys.stderr)
     raise SystemExit(1)
 
-latest_first = view.find("for item in steps.reverse()")
-row_limit = view.find("inspectedRows >= HealthKitExportLookbackDays")
+latest_first = policy.find("let newestFirst")
+row_limit = policy.find("inspectedRows >= HealthKitExportLookbackDays")
 query_limit = view.find("dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays")
-field_validation = view.find("if let date = validExportField(item.date)")
-payload_append = view.find('json.append(["date": date, "value": value])')
-chronological_return = view.find("return json.reverse()")
+field_validation = policy.find("if let date = healthKitValidExportField(row.0)")
+payload_append = policy.find("selected.append((date, value))")
+chronological_return = policy.find("return Array(selected.reversed())")
 if -1 in (latest_first, row_limit, query_limit, field_validation, payload_append, chronological_return) or not (
     latest_first < row_limit < field_validation < payload_append < chronological_return
 ):
     print("HealthKit export must select the newest bounded window and restore chronological order.", file=sys.stderr)
     raise SystemExit(1)
 
-if view.count("for item in steps.reverse()") != 1 or view.count("return json.reverse()") != 1:
+if policy.count("inspectedRows >= HealthKitExportLookbackDays") != 1 or view.count("healthKitExportRows(rows)") != 1:
     print("HealthKit latest-window ordering contracts must remain unique.", file=sys.stderr)
     raise SystemExit(1)
 

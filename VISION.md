@@ -29,6 +29,9 @@ Current baseline:
 - `scripts/check-baseline.sh` validates privacy-sensitive source invariants,
   HealthKit plist and entitlement metadata, locked CocoaPods versions, and Xcode
   project settings.
+- A standalone Swift harness executes the production export-row policy with
+  synthetic tuples, including bounded-window and invalid-row behavior, without
+  claiming HealthKit or physical-device execution.
 - The app requests read-only HealthKit step-count access.
 - Export uses `HealthKitExportEndpoint` from app metadata, requires an HTTPS URL
   with a host and no embedded username/password userinfo, query string, or
@@ -68,7 +71,7 @@ Next priorities:
 - Verify the privacy baseline on a macOS/Xcode machine with a HealthKit-capable
   device
 - Modernize Swift, Alamofire, SwiftyJSON, and HealthKit APIs in a dedicated pass
-- Add executable tests for authorization and export behavior where the legacy
+- Add executable authorization and integration coverage where the legacy
   toolchain permits reliable isolation
 
 Contribution rules:

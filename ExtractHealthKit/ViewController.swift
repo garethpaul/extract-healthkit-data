@@ -9,31 +9,17 @@
 import UIKit
 import HealthKit
 
-let HealthKitExportLookbackDays = 30
-
-func validExportField(value: String) -> String? {
-    let trimmedValue = value.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-    if trimmedValue.isEmpty {
-        return nil
-    }
-    return trimmedValue
-}
-
 func exportPayload(steps: [Steps]) -> [AnyObject] {
-    var json = [AnyObject]()
-    var inspectedRows = 0
-    for item in steps.reverse() {
-        if inspectedRows >= HealthKitExportLookbackDays {
-            break
-        }
-        inspectedRows += 1
-        if let date = validExportField(item.date) {
-            if let value = validExportField(item.value) {
-                json.append(["date": date, "value": value])
-            }
-        }
+    var rows = [(String, String)]()
+    for item in steps {
+        rows.append((item.date, item.value))
     }
-    return json.reverse()
+
+    var json = [AnyObject]()
+    for row in healthKitExportRows(rows) {
+        json.append(["date": row.0, "value": row.1])
+    }
+    return json
 }
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {

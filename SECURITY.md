@@ -57,6 +57,9 @@ Helpful reports include:
   newest 30 daily buckets while preserving chronological payload order, and
   reject encoded payloads over 64 KiB before assigning an HTTP body or starting
   network handling.
+- The production export-row policy has executable coverage using synthetic
+  tuples only. This evidence does not prove HealthKit authorization, device
+  data access, signing, UIKit integration, or network export behavior.
 - Runtime privacy claims require the physical-device checklist in
   `docs/manual-healthkit-verification.md`, tester-owned data, and a controlled
   HTTPS endpoint. Static checks and hosted project parsing are not evidence that

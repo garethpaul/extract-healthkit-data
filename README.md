@@ -94,7 +94,10 @@ make check
 
 `make check` validates privacy-sensitive source invariants, HealthKit plist and
 entitlement metadata, Podfile lock versions, and Xcode project settings. When
-`xcodebuild` is available, it also checks that Xcode can parse the project.
+`swiftc` is available, it also compiles and runs the production export-row
+policy against synthetic tuples covering empty, bounded, trimming, invalid,
+and no-backfill behavior. When `xcodebuild` is available, it checks that Xcode
+can parse the project.
 
 The same gate can run through an absolute Makefile path from another working
 directory: `make -f /path/to/extract-healthkit-data/Makefile check`.
@@ -110,6 +113,8 @@ For full verification, follow
 on a HealthKit-capable physical device with tester-owned data and a controlled
 HTTPS endpoint. The checklist is defined but has not been executed by the
 Linux maintenance session; hosted project parsing is not device-runtime proof.
+The standalone Swift policy harness likewise does not exercise UIKit,
+HealthKit authorization, signing, device data, or network export.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 
@@ -171,6 +176,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   isolation and non-storage request controls.
 - See `docs/plans/2026-06-14-healthkit-export-response-validation.md` for
   transport and HTTP status validation after an export is queued.
+- See `docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md` for
+  executable synthetic coverage of the production export-row policy.
 - See `docs/manual-healthkit-verification.md` for the physical-device
   authorization, confirmation, export, privacy, and redacted-evidence checklist.
 - See `docs/plans/2026-06-13-healthkit-single-ui-publication.md` for the

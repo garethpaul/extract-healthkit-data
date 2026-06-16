@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-16
+
+- Extracted the production HealthKit export-row policy into a Foundation-only
+  source file shared by the legacy app and a standalone Swift harness.
+- Added executable synthetic coverage for the 30-row window, chronological
+  order, field trimming, invalid rows, and no-backfill behavior.
+
 ## 2026-06-14
 
 - Added a dedicated ephemeral HealthKit export manager that rejects HTTP redirects.

@@ -33,7 +33,8 @@
 
 ## Testing guidance
 
-- `ExtractHealthKitTests/ExtractHealthKitTests.swift` contains only template assertions; do not treat it as meaningful HealthKit or export coverage. The maintained regression gate is `make check`.
+- `ExtractHealthKitTests/ExtractHealthKitTests.swift` contains only template assertions; do not treat it as meaningful HealthKit or export coverage. `Tests/HealthKitExportPolicyTests/main.swift` is the executable synthetic harness for the production row-selection policy, and the maintained regression gate is `make check`.
+- The standalone policy harness does not prove HealthKit authorization, UIKit integration, signing, physical-device behavior, or network export.
 - Start with the narrowest relevant test or Make target, then run `make check` before handing off if the change is not documentation-only.
 - Keep README verification notes in sync when commands, fixtures, or supported toolchains change.
 
