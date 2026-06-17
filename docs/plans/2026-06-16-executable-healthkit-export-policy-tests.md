@@ -44,5 +44,11 @@ without requiring the legacy UIKit and HealthKit application to build.
 - The maintained Make targets and external absolute-Makefile invocation passed.
 - Hostile mutations to the policy limit, delegation, executable cases, project
   membership, and completion evidence were rejected.
+- The implementation was committed as
+  `1437877a3712eb4f06656855868c34ea5bf8b3a9`.
+- Canonical hosted verification passed on that exact implementation head:
+  push run `27643507721` and pull-request run `27643521791` both completed
+  successfully on macOS. PR #11 remained open, clean, and mergeable, and the
+  branch had no open code-scanning alerts.
 - The harness does not prove HealthKit authorization, UIKit behavior, app
   signing, physical-device access, or live network export.

@@ -98,12 +98,18 @@ if ! grep -Fq 'ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))' "$ROOT_DI
   exit 1
 fi
 
-if ! grep -Fq "status: completed" "$EXECUTABLE_EXPORT_POLICY_PLAN" ||
-  ! grep -Fq "synthetic tuples" "$EXECUTABLE_EXPORT_POLICY_PLAN" ||
-  ! grep -Fq "does not prove HealthKit authorization" "$EXECUTABLE_EXPORT_POLICY_PLAN"; then
-  printf '%s\n' "Executable HealthKit export policy plan must record completed, bounded evidence." >&2
-  exit 1
-fi
+for export_policy_plan_contract in \
+  "status: completed" \
+  "synthetic tuples" \
+  "1437877a3712eb4f06656855868c34ea5bf8b3a9" \
+  'push run `27643507721`' \
+  'pull-request run `27643521791`' \
+  "does not prove HealthKit authorization"; do
+  if ! grep -Fq "$export_policy_plan_contract" "$EXECUTABLE_EXPORT_POLICY_PLAN"; then
+    printf '%s\n' "Executable HealthKit export policy plan must retain evidence: $export_policy_plan_contract" >&2
+    exit 1
+  fi
+done
 
 if ! grep -Fq "status: completed" "$LOCATION_INDEPENDENT_MAKE_PLAN" ||
   ! grep -Fq "from /tmp" "$LOCATION_INDEPENDENT_MAKE_PLAN"; then
