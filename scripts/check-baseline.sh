@@ -119,9 +119,13 @@ for signal, status in ((1, 129), (2, 130), (15, 143)):
 PY
 
 for signal_cleanup_plan_contract in \
-  "status: planned" \
+  "status: completed" \
+  "## Status: Completed" \
   'exit-only signal traps leave `healthkit-export-policy-tests.*` behind' \
-  "success, compiler failure, and bounded termination"; do
+  "success, compiler failure, and bounded termination" \
+  "c36ca4164205f183424c1a5e3f67f09d7a72c347" \
+  "27746646358" \
+  "27746648370"; do
   if ! grep -Fq "$signal_cleanup_plan_contract" "$EXPORT_HARNESS_SIGNAL_PLAN"; then
     printf '%s\n' "HealthKit harness signal-cleanup plan must retain evidence: $signal_cleanup_plan_contract" >&2
     exit 1

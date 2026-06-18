@@ -2,13 +2,13 @@
 title: HealthKit Export Harness Signal Cleanup
 type: reliability
 date: 2026-06-18
-status: planned
+status: completed
 execution: code
 ---
 
 # HealthKit Export Harness Signal Cleanup
 
-## Status: Planned
+## Status: Completed
 
 ## Summary
 
@@ -39,3 +39,18 @@ its exit-only signal traps leave `healthkit-export-policy-tests.*` behind after
 - Mutate the direct cleanup call and prove the baseline gate rejects it.
 - Record the implementation commit and exact-head hosted results only after
   they exist.
+
+## Verification Results
+
+- `sh -n` passed for the export policy runner and baseline gate.
+- Repository and external-directory `make check` passed with truthful local
+  skips for unavailable `swiftc` and `xcodebuild`.
+- Isolated fake-compiler probes covered success, compiler failure status 42,
+  and bounded `TERM` cleanup; every temporary audit directory was empty after
+  completion.
+- Mutations removing direct signal cleanup or restoring the exit-only `TERM`
+  binding were rejected by the maintained baseline contract.
+- Diff, generated-artifact, and high-confidence secret audits passed.
+- Implementation commit `c36ca4164205f183424c1a5e3f67f09d7a72c347`
+  passed exact-head push run `27746646358` and pull-request run `27746648370`
+  on macOS.
