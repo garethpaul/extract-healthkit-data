@@ -32,6 +32,7 @@ LOCATION_INDEPENDENT_MAKE_PLAN="$ROOT_DIR/docs/plans/2026-06-13-location-indepen
 REDIRECT_BOUNDARY_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-redirect-boundary.md"
 EXPORT_RESPONSE_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-response-validation.md"
 EXECUTABLE_EXPORT_POLICY_PLAN="$ROOT_DIR/docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md"
+EXPORT_HARNESS_SIGNAL_PLAN="$ROOT_DIR/docs/plans/2026-06-18-healthkit-export-harness-signal-cleanup.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -83,9 +84,48 @@ for path in \
   "docs/plans/2026-06-14-healthkit-export-redirect-boundary.md" \
   "docs/plans/2026-06-14-healthkit-export-response-validation.md" \
   "docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md" \
+  "docs/plans/2026-06-18-healthkit-export-harness-signal-cleanup.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
+done
+
+python3 - "$EXPORT_POLICY_RUNNER" <<'PY'
+import pathlib
+import re
+import sys
+
+runner = pathlib.Path(sys.argv[1]).read_text()
+handler = re.compile(
+    r'''handle_signal\(\) \{\s*'''
+    r'''status=\$1\s*'''
+    r'''trap - 0 1 2 15\s*'''
+    r'''cleanup\s*'''
+    r'''exit "\$status"\s*'''
+    r'''\}'''
+)
+
+if not handler.search(runner):
+    raise SystemExit(
+        "HealthKit export policy runner signals must clean temporary output before exiting."
+    )
+
+for signal, status in ((1, 129), (2, 130), (15, 143)):
+    binding = f"trap 'handle_signal {status}' {signal}"
+    if binding not in runner:
+        raise SystemExit(
+            f"HealthKit export policy runner must retain signal binding: {binding}"
+        )
+PY
+
+for signal_cleanup_plan_contract in \
+  "status: planned" \
+  'exit-only signal traps leave `healthkit-export-policy-tests.*` behind' \
+  "success, compiler failure, and bounded termination"; do
+  if ! grep -Fq "$signal_cleanup_plan_contract" "$EXPORT_HARNESS_SIGNAL_PLAN"; then
+    printf '%s\n' "HealthKit harness signal-cleanup plan must retain evidence: $signal_cleanup_plan_contract" >&2
+    exit 1
+  fi
 done
 
 if ! grep -Fq 'ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))' "$ROOT_DIR/Makefile" ||
