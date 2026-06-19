@@ -12,6 +12,15 @@ import Alamofire
 let HealthKitExportEndpointKey = "HealthKitExportEndpoint"
 let HealthKitExportTimeout: NSTimeInterval = 30
 let HealthKitExportMaxPayloadBytes = 64 * 1024
+let HealthKitExportManager: Alamofire.Manager = {
+    let configuration = NSURLSessionConfiguration.ephemeralSessionConfiguration()
+    configuration.HTTPAdditionalHeaders = Alamofire.Manager.defaultHTTPHeaders
+    let manager = Alamofire.Manager(configuration: configuration)
+    manager.delegate.taskWillPerformHTTPRedirection = { _, _, _, _ in
+        return nil
+    }
+    return manager
+}()
 
 func exportEndpointURL() -> NSURL? {
     let endpoint = NSBundle.mainBundle().objectForInfoDictionaryKey(HealthKitExportEndpointKey) as? String
@@ -37,13 +46,15 @@ func exportEndpointURL() -> NSURL? {
     return nil
 }
 
-func postRequest(payload: AnyObject) -> Bool {
+func postRequest(payload: AnyObject, completion: (Bool) -> Void) -> Bool {
 
     if let url = exportEndpointURL() {
         let request = NSMutableURLRequest(URL: url)
         request.HTTPMethod = "POST"
+        request.HTTPShouldHandleCookies = false
         request.timeoutInterval = HealthKitExportTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
         if !NSJSONSerialization.isValidJSONObject(payload) {
             return false
         }
@@ -58,7 +69,15 @@ func postRequest(payload: AnyObject) -> Bool {
             }
             request.HTTPBody = encodedBody
         }
-        Alamofire.request(request)
+        HealthKitExportManager.request(request).response { (_, response, _, error) in
+            var succeeded = false
+            if error == nil {
+                if let statusCode = response?.statusCode {
+                    succeeded = statusCode >= 200 && statusCode < 300
+                }
+            }
+            completion(succeeded)
+        }
         return true
     }
 

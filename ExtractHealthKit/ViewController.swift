@@ -9,29 +9,15 @@
 import UIKit
 import HealthKit
 
-let HealthKitExportLookbackDays = 30
-
-func validExportField(value: String) -> String? {
-    let trimmedValue = value.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-    if trimmedValue.isEmpty {
-        return nil
-    }
-    return trimmedValue
-}
-
 func exportPayload(steps: [Steps]) -> [AnyObject] {
-    var json = [AnyObject]()
-    var inspectedRows = 0
+    var rows = [(String, String)]()
     for item in steps {
-        if inspectedRows >= HealthKitExportLookbackDays {
-            break
-        }
-        inspectedRows += 1
-        if let date = validExportField(item.date) {
-            if let value = validExportField(item.value) {
-                json.append(["date": date, "value": value])
-            }
-        }
+        rows.append((item.date, item.value))
+    }
+
+    var json = [AnyObject]()
+    for row in healthKitExportRows(rows) {
+        json.append(["date": row.0, "value": row.1])
     }
     return json
 }
@@ -75,9 +61,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
     }
     
-    func sortArray() {
-        tableData = outData.reverse()
+    func publishHealthKitData(data: [Steps]) {
         dispatch_async(dispatch_get_main_queue(), {
+            self.outData = data
+            self.tableData = data.reverse()
             self.tableView.reloadData()
             return
         })
@@ -154,7 +141,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let anchorDate = calendar.dateFromComponents(anchorComponents)
         let intervalComponents = NSDateComponents()
         intervalComponents.day = 1
-        let query = HKStatisticsCollectionQuery(quantityType: stepsCount, quantitySamplePredicate: nil, options: .CumulativeSum, anchorDate: anchorDate, intervalComponents: intervalComponents)
+        let endDate = NSDate()
+        let startDate = calendar.dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays, toDate: endDate, options: nil)
+        let samplePredicate = HKQuery.predicateForSamplesWithStartDate(startDate, endDate: endDate, options: .StrictStartDate)
+        let query = HKStatisticsCollectionQuery(quantityType: stepsCount, quantitySamplePredicate: samplePredicate, options: .CumulativeSum, anchorDate: anchorDate, intervalComponents: intervalComponents)
         
         query.initialResultsHandler = {
             query, results, error in
@@ -165,8 +155,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 return
             }
             
-            let endDate = NSDate()
-            let startDate = calendar.dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays, toDate: endDate, options: nil)
+            var queryData:[Steps] = []
             results.enumerateStatisticsFromDate(startDate, toDate: endDate) {
                 statistics, stop in
                 
@@ -178,11 +167,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     let s = dateFormatter.stringFromDate(date)
                     let value = Int(round(quantity.doubleValueForUnit(HKUnit.countUnit())))
                     let val = "\(value)"
-                    self.outData.append(Steps(date: s, value: val))
+                    queryData.append(Steps(date: s, value: val))
                 }
                 
-                self.sortArray()
             }
+
+            self.publishHealthKitData(queryData)
             
         }
 
@@ -208,8 +198,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
 
             // Construct HTTP Request
-            if !postRequest(json) {
-                println("HealthKit export endpoint is not configured.")
+            if !postRequest(json, completion: { succeeded in
+                if succeeded {
+                    println("HealthKit export completed.")
+                }
+                else {
+                    println("HealthKit export failed.")
+                }
+            }) {
+                println("HealthKit export request was not queued.")
             }
             
         }))

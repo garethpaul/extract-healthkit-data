@@ -1,7 +1,42 @@
 # Changes
 
+## 2026-06-18
+
+- Bounded the HealthKit statistics query itself to the exact 30-day sample
+  window instead of calculating over every stored step-count sample.
+- Built query results in a callback-local snapshot and published both export
+  and table state together on the main queue.
+
+## 2026-06-16
+
+- Extracted the production HealthKit export-row policy into a Foundation-only
+  source file shared by the legacy app and a standalone Swift harness.
+- Added executable synthetic coverage for the 30-row window, chronological
+  order, field trimming, invalid rows, and no-backfill behavior.
+
+## 2026-06-14
+
+- Added a dedicated ephemeral HealthKit export manager that rejects HTTP redirects.
+- Required a transport-error-free HTTP 2xx response before reporting a queued
+  HealthKit export as completed.
+
+## 2026-06-13
+
+- Made Make verification independent of the caller's working directory.
+- Selected the newest 30 collected HealthKit daily buckets for export while
+  preserving chronological payload order when the query yields 31 boundaries.
+- Published each completed HealthKit statistics result to the table once on the
+  main queue instead of reloading for every enumerated day.
+- Disabled cookie handling and added Cache-Control: no-store before HealthKit
+  export serialization and request dispatch.
+- Added a truthful physical-device checklist for read-only authorization,
+  exact 30-day consent, controlled export inspection, failures, and redacted
+  evidence; the checklist remains unexecuted in the Linux maintenance session.
+
 ## 2026-06-12
 
+- Stopped the hosted macOS checkout from persisting its credential and added an
+  exact contract for the sole workflow and checkout step.
 - Replaced the variable-length one-calendar-month HealthKit query with an exact
   30-day lookback matching the export confirmation alert.
 - Reused the same 30-day constant as the maximum inspected export rows so data

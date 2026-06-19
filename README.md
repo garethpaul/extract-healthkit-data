@@ -66,13 +66,23 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Export payload construction keeps only rows with valid date/value fields and
   skips the network request if filtering leaves no rows.
 - The HealthKit query uses an exact 30-day lookback, and export construction
-  inspects at most the same 30 daily rows before rejecting encoded JSON larger
-  than 64 KiB or handing data to network code.
+  selects the newest 30 daily buckets while preserving chronological payload
+  order before rejecting encoded JSON larger than 64 KiB or handing data to
+  network code.
 - Export requests are only serialized when the payload is one of Foundation's
   valid JSON objects.
 - Export requests use a bounded timeout before being handed to Alamofire.
+- Each export request disables shared HTTP cookie handling and declares
+  `Cache-Control: no-store` before serializing or sending HealthKit data.
+- A dedicated ephemeral export session rejects HTTP redirects so validated
+  HealthKit payloads cannot be forwarded to another destination.
+- A queued export is reported as completed only after a transport-error-free HTTP 2xx response;
+  failures use generic diagnostics without response bodies,
+  endpoint details, payloads, or raw errors.
 - HealthKit authorization and query failures use generic log messages instead
   of raw HealthKit error descriptions.
+- Completed HealthKit statistics are published to the table once, with both the
+  backing array assignment and reload performed on the main queue.
 
 ## Testing and Verification
 
@@ -84,15 +94,27 @@ make check
 
 `make check` validates privacy-sensitive source invariants, HealthKit plist and
 entitlement metadata, Podfile lock versions, and Xcode project settings. When
-`xcodebuild` is available, it also checks that Xcode can parse the project.
+`swiftc` is available, it also compiles and runs the production export-row
+policy against synthetic tuples covering empty, bounded, trimming, invalid,
+and no-backfill behavior. When `xcodebuild` is available, it checks that Xcode
+can parse the project.
+
+The same gate can run through an absolute Makefile path from another working
+directory: `make -f /path/to/extract-healthkit-data/Makefile check`.
 
 GitHub Actions runs `make check` on a fixed `macos-15` runner for pushes, pull
 requests, and manual dispatches. The job pins checkout by commit, uses read-only
-repository permissions, and exercises the Xcode project parse without HealthKit
+repository permissions, does not persist the checkout credential, and exercises
+the Xcode project parse without HealthKit
 records, endpoint values, credentials, simulators, or devices.
 
-For full verification, run the app on a HealthKit-capable device with test data
-you control.
+For full verification, follow
+[`docs/manual-healthkit-verification.md`](docs/manual-healthkit-verification.md)
+on a HealthKit-capable physical device with tester-owned data and a controlled
+HTTPS endpoint. The checklist is defined but has not been executed by the
+Linux maintenance session; hosted project parsing is not device-runtime proof.
+The standalone Swift policy harness likewise does not exercise UIKit,
+HealthKit authorization, signing, device data, or network export.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 
@@ -118,6 +140,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   verification notes and tests.
 - Keep HealthKit collection and egress bounded to the shared 30-day limit and
   64 KiB of encoded JSON before a request is queued.
+- Apply that 30-day boundary to the HealthKit sample predicate itself, and
+  publish completed query results as one main-queue snapshot before export.
 
 ## Maintenance Notes
 
@@ -148,6 +172,18 @@ When the required SDK or runtime is unavailable, use static checks and source re
   byte limits before HealthKit export.
 - See `docs/plans/2026-06-12-healthkit-exact-30-day-scope.md` for the shared
   query and export lookback boundary.
+- See `docs/plans/2026-06-13-healthkit-latest-export-window.md` for newest-window
+  selection and chronological payload ordering.
+- See `docs/plans/2026-06-13-healthkit-request-privacy.md` for outbound cookie
+  isolation and non-storage request controls.
+- See `docs/plans/2026-06-14-healthkit-export-response-validation.md` for
+  transport and HTTP status validation after an export is queued.
+- See `docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md` for
+  executable synthetic coverage of the production export-row policy.
+- See `docs/manual-healthkit-verification.md` for the physical-device
+  authorization, confirmation, export, privacy, and redacted-evidence checklist.
+- See `docs/plans/2026-06-13-healthkit-single-ui-publication.md` for the
+  single main-queue table publication boundary.
 
 ## Contributing
 

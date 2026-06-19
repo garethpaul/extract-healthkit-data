@@ -24,9 +24,14 @@ Priority:
 
 Current baseline:
 
+- Make verification resolves repository paths independently of the caller's
+  working directory.
 - `scripts/check-baseline.sh` validates privacy-sensitive source invariants,
   HealthKit plist and entitlement metadata, locked CocoaPods versions, and Xcode
   project settings.
+- A standalone Swift harness executes the production export-row policy with
+  synthetic tuples, including bounded-window and invalid-row behavior, without
+  claiming HealthKit or physical-device execution.
 - The app requests read-only HealthKit step-count access.
 - Export uses `HealthKitExportEndpoint` from app metadata, requires an HTTPS URL
   with a host and no embedded username/password userinfo, query string, or
@@ -37,24 +42,39 @@ Current baseline:
   skips the network request if filtering leaves no rows.
 - Export serialization only runs for Foundation-valid JSON objects.
 - Export requests use a bounded timeout before Alamofire network handling.
-- HealthKit collection and export share an exact 30-day limit, with payloads
-  capped at 30 inspected daily rows and 64 KiB of encoded JSON before network
-  handling.
+- Request cookie handling is disabled and export bodies are marked no-store
+  before Alamofire network handling.
+- A dedicated ephemeral export session rejects HTTP redirects after endpoint
+  validation.
+- Queued exports report completion only after a transport-error-free HTTP 2xx response,
+  with generic diagnostics that omit response bodies, endpoint
+  details, payloads, status text, and raw errors.
+- HealthKit collection and export share an exact 30-day limit applied at the
+  sample predicate, with payloads selecting the newest 30 daily buckets in
+  chronological order and remaining below 64 KiB of encoded JSON before
+  network handling.
 - HealthKit failure logging uses generic messages instead of raw HealthKit
   error descriptions.
 - `.gitignore` and the static baseline keep local provisioning profiles,
   signing certificates, certificate requests, app archives, and archive
   intermediates out of source control.
 - HealthKit query errors no longer abort the app.
+- HealthKit statistics publish one complete export and table snapshot on the
+  main queue after enumeration, avoiding off-main export-state mutation and
+  per-row UI reloads.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
-  fixed macOS runner before review.
+  fixed macOS runner with a credential-free checkout before review.
+- A physical-device checklist now covers read-only authorization, exact 30-day
+  confirmation, cancellation, controlled HTTPS export inspection, failures, and
+  redacted evidence without claiming that the checklist has been executed.
 
 Next priorities:
 
 - Verify the privacy baseline on a macOS/Xcode machine with a HealthKit-capable
   device
 - Modernize Swift, Alamofire, SwiftyJSON, and HealthKit APIs in a dedicated pass
-- Add tests or manual verification notes for authorization and export behavior
+- Add executable authorization and integration coverage where the legacy
+  toolchain permits reliable isolation
 
 Contribution rules:
 

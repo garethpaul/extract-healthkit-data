@@ -40,16 +40,37 @@ Helpful reports include:
   handling.
 - HealthKit authorization and query failures should not log raw HealthKit error
   descriptions.
+- HealthKit queries should constrain matching samples to the exact 30-day
+  window instead of calculating over the full step-count history.
+- HealthKit query results should update export state, the table backing array,
+  and reload the table together on the main queue after statistics enumeration
+  completes.
 - HealthKit export payloads should keep only rows with valid date/value fields
   and skip network handling if filtering leaves no rows.
 - HealthKit export requests should use a bounded timeout before network
   handling.
-- HealthKit queries and export should share an exact 30-day limit, inspect at
-  most 30 daily rows, and reject encoded payloads over 64 KiB before assigning
-  an HTTP body or starting network handling.
+- HealthKit export requests should disable cookie handling and declare Cache-Control: no-store
+  before serialization and network handling.
+- The dedicated ephemeral HealthKit export session rejects HTTP redirects so
+  endpoint validation cannot be bypassed after request dispatch.
+- A queued HealthKit export should report completion only after a
+  transport-error-free HTTP 2xx response; diagnostics must not include response
+  bodies, endpoint details, payloads, status text, or raw errors.
+- HealthKit queries and export should share an exact 30-day limit, select the
+  newest 30 daily buckets while preserving chronological payload order, and
+  reject encoded payloads over 64 KiB before assigning an HTTP body or starting
+  network handling.
+- The production export-row policy has executable coverage using synthetic
+  tuples only. This evidence does not prove HealthKit authorization, device
+  data access, signing, UIKit integration, or network export behavior.
+- Runtime privacy claims require the physical-device checklist in
+  `docs/manual-healthkit-verification.md`, tester-owned data, and a controlled
+  HTTPS endpoint. Static checks and hosted project parsing are not evidence that
+  authorization, consent cancellation, cookie isolation, or export behavior ran.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
-  fixed macOS runner with pinned checkout, read-only repository access, and a
-  bounded runtime. Hosted checks must not use real HealthKit records or private
+  fixed macOS runner with pinned checkout, read-only repository access, a
+  credential-free checkout, and a bounded runtime. Hosted checks must not use
+  real HealthKit records or private
   endpoint values.
 
 ## Mobile Privacy Notes

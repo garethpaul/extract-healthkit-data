@@ -19,6 +19,7 @@
 
 - Install dependencies: `pod install`
 - Full baseline: `make check`
+- External baseline: `make -f /absolute/path/to/Makefile check`
 - Lint/static checks: `make lint`
 - Tests: `make test`
 - Build: `make build`
@@ -32,7 +33,8 @@
 
 ## Testing guidance
 
-- `ExtractHealthKitTests/ExtractHealthKitTests.swift` contains only template assertions; do not treat it as meaningful HealthKit or export coverage. The maintained regression gate is `make check`.
+- `ExtractHealthKitTests/ExtractHealthKitTests.swift` contains only template assertions; do not treat it as meaningful HealthKit or export coverage. `Tests/HealthKitExportPolicyTests/main.swift` is the executable synthetic harness for the production row-selection policy, and the maintained regression gate is `make check`.
+- The standalone policy harness does not prove HealthKit authorization, UIKit integration, signing, physical-device behavior, or network export.
 - Start with the narrowest relevant test or Make target, then run `make check` before handing off if the change is not documentation-only.
 - Keep README verification notes in sync when commands, fixtures, or supported toolchains change.
 
@@ -50,9 +52,12 @@
 - Provisioning profiles, signing certificates, certificate requests, app archives, and archive intermediates are ignored and must stay out of source control.
 - Do not log, commit, or fixture real HealthKit records. Use synthetic data for verification notes and tests.
 - Keep HealthKit authorization read-only and preserve the user confirmation before export. Authorization and query failures must use generic logs rather than raw HealthKit error descriptions.
-- Export only non-empty rows with valid trimmed `date` and `value` fields, skip requests when no valid rows remain, inspect at most 30 rows, and reject encoded JSON larger than 64 KiB.
+- Export only non-empty rows with valid trimmed `date` and `value` fields, skip requests when no valid rows remain, select the newest 30 daily buckets in chronological order, and reject encoded JSON larger than 64 KiB.
 - The export body must remain a Foundation-valid JSON object, use `application/json`, and apply the 30-second request timeout before Alamofire queues the request.
+- Use the dedicated ephemeral export manager that rejects HTTP redirects; do not dispatch HealthKit payloads through Alamofire's shared request helper.
+- Treat an export as completed only after a transport-error-free HTTP 2xx response; keep response bodies, endpoint details, payloads, status text, and raw errors out of diagnostics.
 - Hosted macOS CI proves the Xcode project parses, not that the app builds, signs, receives HealthKit authorization, or successfully exports from a device.
+- Use `docs/manual-healthkit-verification.md` for physical-device verification. Keep its device, tester-owned data, controlled HTTPS endpoint, cancellation, request privacy, failure, and redacted-evidence requirements intact; do not mark it executed without a real Apple-platform run.
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 
