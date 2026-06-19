@@ -140,6 +140,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   verification notes and tests.
 - Keep HealthKit collection and egress bounded to the shared 30-day limit and
   64 KiB of encoded JSON before a request is queued.
+- Apply that 30-day boundary to the HealthKit sample predicate itself, and
+  publish completed query results as one main-queue snapshot before export.
 
 ## Maintenance Notes
 

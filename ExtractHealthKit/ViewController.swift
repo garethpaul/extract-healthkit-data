@@ -61,9 +61,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
     }
     
-    func sortArray() {
+    func publishHealthKitData(data: [Steps]) {
         dispatch_async(dispatch_get_main_queue(), {
-            self.tableData = self.outData.reverse()
+            self.outData = data
+            self.tableData = data.reverse()
             self.tableView.reloadData()
             return
         })
@@ -140,7 +141,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let anchorDate = calendar.dateFromComponents(anchorComponents)
         let intervalComponents = NSDateComponents()
         intervalComponents.day = 1
-        let query = HKStatisticsCollectionQuery(quantityType: stepsCount, quantitySamplePredicate: nil, options: .CumulativeSum, anchorDate: anchorDate, intervalComponents: intervalComponents)
+        let endDate = NSDate()
+        let startDate = calendar.dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays, toDate: endDate, options: nil)
+        let samplePredicate = HKQuery.predicateForSamplesWithStartDate(startDate, endDate: endDate, options: .StrictStartDate)
+        let query = HKStatisticsCollectionQuery(quantityType: stepsCount, quantitySamplePredicate: samplePredicate, options: .CumulativeSum, anchorDate: anchorDate, intervalComponents: intervalComponents)
         
         query.initialResultsHandler = {
             query, results, error in
@@ -151,8 +155,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 return
             }
             
-            let endDate = NSDate()
-            let startDate = calendar.dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays, toDate: endDate, options: nil)
+            var queryData:[Steps] = []
             results.enumerateStatisticsFromDate(startDate, toDate: endDate) {
                 statistics, stop in
                 
@@ -164,12 +167,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     let s = dateFormatter.stringFromDate(date)
                     let value = Int(round(quantity.doubleValueForUnit(HKUnit.countUnit())))
                     let val = "\(value)"
-                    self.outData.append(Steps(date: s, value: val))
+                    queryData.append(Steps(date: s, value: val))
                 }
                 
             }
 
-            self.sortArray()
+            self.publishHealthKitData(queryData)
             
         }
 

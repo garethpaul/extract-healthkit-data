@@ -49,17 +49,19 @@ Current baseline:
 - Queued exports report completion only after a transport-error-free HTTP 2xx response,
   with generic diagnostics that omit response bodies, endpoint
   details, payloads, status text, and raw errors.
-- HealthKit collection and export share an exact 30-day limit, with payloads
-  selecting the newest 30 daily buckets in chronological order and remaining
-  below 64 KiB of encoded JSON before network handling.
+- HealthKit collection and export share an exact 30-day limit applied at the
+  sample predicate, with payloads selecting the newest 30 daily buckets in
+  chronological order and remaining below 64 KiB of encoded JSON before
+  network handling.
 - HealthKit failure logging uses generic messages instead of raw HealthKit
   error descriptions.
 - `.gitignore` and the static baseline keep local provisioning profiles,
   signing certificates, certificate requests, app archives, and archive
   intermediates out of source control.
 - HealthKit query errors no longer abort the app.
-- HealthKit statistics publish one complete table snapshot on the main queue
-  after enumeration, avoiding per-row UI reloads.
+- HealthKit statistics publish one complete export and table snapshot on the
+  main queue after enumeration, avoiding off-main export-state mutation and
+  per-row UI reloads.
 - GitHub Actions runs the offline privacy baseline and Xcode project parse on a
   fixed macOS runner with a credential-free checkout before review.
 - A physical-device checklist now covers read-only authorization, exact 30-day

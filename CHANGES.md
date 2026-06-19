@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-18
+
+- Bounded the HealthKit statistics query itself to the exact 30-day sample
+  window instead of calculating over every stored step-count sample.
+- Built query results in a callback-local snapshot and published both export
+  and table state together on the main queue.
+
 ## 2026-06-16
 
 - Extracted the production HealthKit export-row policy into a Foundation-only

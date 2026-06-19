@@ -174,24 +174,25 @@ import pathlib
 import sys
 
 source = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
-sort_array = source.split("    func sortArray()", 1)[1].split("    func tableView", 1)[0]
+publication = source.split("    func publishHealthKitData(data: [Steps])", 1)[1].split("    func tableView", 1)[0]
 query_handler = source.split("        query.initialResultsHandler =", 1)[1].split(
     "        theHealthStore.executeQuery(query)", 1
 )[0]
 
 dispatch = "dispatch_async(dispatch_get_main_queue()"
-assignment = "self.tableData = self.outData.reverse()"
+export_assignment = "self.outData = data"
+table_assignment = "self.tableData = data.reverse()"
 reload = "self.tableView.reloadData()"
-if any(sort_array.count(contract) != 1 for contract in (dispatch, assignment, reload)):
-    raise SystemExit("HealthKit UI publication calls must remain unique in sortArray.")
-if not sort_array.index(dispatch) < sort_array.index(assignment) < sort_array.index(reload):
-    raise SystemExit("HealthKit table data and reload must publish together on the main queue.")
-if "tableData = outData.reverse()" in sort_array:
-    raise SystemExit("HealthKit table data must not mutate before the main-queue block.")
-if query_handler.count("self.sortArray()") != 1:
+if any(publication.count(contract) != 1 for contract in (dispatch, export_assignment, table_assignment, reload)):
+    raise SystemExit("HealthKit export and UI publication calls must remain unique.")
+if not publication.index(dispatch) < publication.index(export_assignment) < publication.index(table_assignment) < publication.index(reload):
+    raise SystemExit("HealthKit export and table snapshots must publish together on the main queue.")
+if query_handler.count("self.publishHealthKitData(queryData)") != 1:
     raise SystemExit("HealthKit query results must publish exactly once.")
-if "            }\n\n            self.sortArray()" not in query_handler:
+if "            }\n\n            self.publishHealthKitData(queryData)" not in query_handler:
     raise SystemExit("HealthKit query results must publish after statistics enumeration completes.")
+if "self.outData.append" in query_handler or query_handler.count("queryData.append") != 1:
+    raise SystemExit("HealthKit query callbacks must build a local snapshot instead of mutating export state off-main.")
 PY
 
 if ! grep -Fq "status: completed" "$SINGLE_PUBLICATION_PLAN" ||
@@ -203,8 +204,8 @@ if ! grep -Fq "status: completed" "$SINGLE_PUBLICATION_PLAN" ||
 fi
 
 if ! grep -Fq "statistics are published to the table once" "$README" ||
-  ! grep -Fq "table together on the main queue" "$ROOT_DIR/SECURITY.md" ||
-  ! grep -Fq "publish one complete table snapshot" "$VISION" ||
+  ! grep -Fq "export state, the table backing array" "$ROOT_DIR/SECURITY.md" ||
+  ! grep -Fq "publish one complete export and table snapshot" "$VISION" ||
   ! grep -Fq "Published each completed HealthKit statistics result" "$ROOT_DIR/CHANGES.md"; then
   printf '%s\n' "Project docs must preserve the HealthKit single-publication boundary." >&2
   exit 1
@@ -321,6 +322,9 @@ if ! grep -Fq "requestAuthorizationToShareTypes(nil" "$VIEW" ||
   ! grep -Fq "func exportPayload(steps: [Steps]) -> [AnyObject]" "$VIEW" ||
   ! grep -Fq "healthKitExportRows(rows)" "$VIEW" ||
   ! grep -Fq "dateByAddingUnit(.CalendarUnitDay, value: -HealthKitExportLookbackDays" "$VIEW" ||
+  ! grep -Fq "predicateForSamplesWithStartDate(startDate, endDate: endDate, options: .StrictStartDate)" "$VIEW" ||
+  ! grep -Fq "quantitySamplePredicate: samplePredicate" "$VIEW" ||
+  grep -Fq "quantitySamplePredicate: nil" "$VIEW" ||
   grep -Fq "dateByAddingUnit(.CalendarUnitMonth, value: -1" "$VIEW" ||
   ! grep -Fq "self.outData.isEmpty" "$VIEW" ||
   ! grep -Fq "No HealthKit step data available to export." "$VIEW" ||
