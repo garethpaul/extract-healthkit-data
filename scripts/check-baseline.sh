@@ -132,13 +132,13 @@ for signal_cleanup_plan_contract in \
   fi
 done
 
-if ! grep -Fq 'ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))' "$ROOT_DIR/Makefile" ||
+if ! grep -Fq 'override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))' "$ROOT_DIR/Makefile" ||
   ! grep -Fq 'XCODEBUILD ?= xcodebuild' "$ROOT_DIR/Makefile" ||
   ! grep -Fq 'SWIFTC ?= swiftc' "$ROOT_DIR/Makefile" ||
   ! grep -Fq '"$(ROOT)/scripts/run-healthkit-export-policy-tests.sh"' "$ROOT_DIR/Makefile" ||
   ! grep -Fq '"$(ROOT)/scripts/check-baseline.sh"' "$ROOT_DIR/Makefile" ||
   ! grep -Fq '$(XCODEBUILD) -list -project "$(ROOT)/ExtractHealthKit.xcodeproj"' "$ROOT_DIR/Makefile"; then
-  printf '%s\n' "Makefile checks must resolve privacy and Xcode project paths from the loaded Makefile." >&2
+  printf '%s\n' "Makefile checks must protect and resolve privacy and Xcode project paths from the loaded Makefile." >&2
   exit 1
 fi
 

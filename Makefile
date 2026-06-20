@@ -1,6 +1,6 @@
 .PHONY: build check lint test xcode-list
 
-ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 XCODEBUILD ?= xcodebuild
 SWIFTC ?= swiftc
 
