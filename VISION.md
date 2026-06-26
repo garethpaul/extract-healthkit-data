@@ -49,6 +49,8 @@ Current baseline:
 - Queued exports report completion only after a transport-error-free HTTP 2xx response,
   with generic diagnostics that omit response bodies, endpoint
   details, payloads, status text, and raw errors.
+- Keep one in-flight HealthKit export per controller and release ownership only
+  after completion or synchronous queue rejection.
 - HealthKit collection and export share an exact 30-day limit applied at the
   sample predicate, with payloads selecting the newest 30 daily buckets in
   chronological order and remaining below 64 KiB of encoded JSON before

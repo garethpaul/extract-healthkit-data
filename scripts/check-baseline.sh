@@ -33,6 +33,7 @@ REDIRECT_BOUNDARY_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-redirec
 EXPORT_RESPONSE_PLAN="$ROOT_DIR/docs/plans/2026-06-14-healthkit-export-response-validation.md"
 EXECUTABLE_EXPORT_POLICY_PLAN="$ROOT_DIR/docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md"
 EXPORT_HARNESS_SIGNAL_PLAN="$ROOT_DIR/docs/plans/2026-06-18-healthkit-export-harness-signal-cleanup.md"
+SINGLE_INFLIGHT_EXPORT_PLAN="$ROOT_DIR/docs/plans/2026-06-26-single-inflight-healthkit-export.md"
 MANUAL_VERIFICATION="$ROOT_DIR/docs/manual-healthkit-verification.md"
 CI_WORKFLOW="$ROOT_DIR/.github/workflows/check.yml"
 
@@ -85,6 +86,7 @@ for path in \
   "docs/plans/2026-06-14-healthkit-export-response-validation.md" \
   "docs/plans/2026-06-16-executable-healthkit-export-policy-tests.md" \
   "docs/plans/2026-06-18-healthkit-export-harness-signal-cleanup.md" \
+  "docs/plans/2026-06-26-single-inflight-healthkit-export.md" \
   "docs/plans/2026-06-08-healthkit-endpoint-host-validation.md" \
   "docs/plans/2026-06-08-extract-healthkit-privacy-baseline.md"; do
   require_file "$path"
@@ -194,6 +196,44 @@ if "            }\n\n            self.publishHealthKitData(queryData)" not in qu
 if "self.outData.append" in query_handler or query_handler.count("queryData.append") != 1:
     raise SystemExit("HealthKit query callbacks must build a local snapshot instead of mutating export state off-main.")
 PY
+
+python3 - "$VIEW" <<'PY'
+import pathlib
+import sys
+
+source = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+export_action = source.split("    @IBAction func exportData(sender: AnyObject)", 1)[1]
+
+guard = "if exportInFlight {"
+alert = 'var exportAlert = UIAlertController(title: "Export Data"'
+claim = "self.exportInFlight = true"
+request = "postRequest(json, completion:"
+completion_release = "{ succeeded in\n                self.exportInFlight = false"
+queue_failure_release = "}) {\n                self.exportInFlight = false"
+
+if source.count("var exportInFlight = false") != 1:
+    raise SystemExit("HealthKit export ownership must keep one controller in-flight flag.")
+if guard not in export_action or alert not in export_action or export_action.index(guard) > export_action.index(alert):
+    raise SystemExit("HealthKit export must reject duplicate confirmation while a request is in flight.")
+if export_action.count(claim) != 1 or request not in export_action or export_action.index(claim) > export_action.index(request):
+    raise SystemExit("HealthKit export must claim in-flight ownership before queuing the request.")
+if completion_release not in export_action or queue_failure_release not in export_action:
+    raise SystemExit("HealthKit export must release in-flight ownership after completion or queue rejection.")
+PY
+
+if ! grep -Fq "status: completed" "$SINGLE_INFLIGHT_EXPORT_PLAN" ||
+  ! grep -Fq "Five isolated hostile mutations were rejected" "$SINGLE_INFLIGHT_EXPORT_PLAN" ||
+  ! grep -Fq "hosted macOS" "$SINGLE_INFLIGHT_EXPORT_PLAN"; then
+  printf '%s\n' "Single in-flight HealthKit export plan must record completed verification." >&2
+  exit 1
+fi
+
+for document in "$README" "$ROOT_DIR/SECURITY.md" "$VISION"; do
+  if ! grep -Fq "one in-flight HealthKit export" "$document"; then
+    printf '%s\n' "$document must document single in-flight HealthKit export ownership." >&2
+    exit 1
+  fi
+done
 
 if ! grep -Fq "status: completed" "$SINGLE_PUBLICATION_PLAN" ||
   ! grep -Fq "hostile mutations were rejected" "$SINGLE_PUBLICATION_PLAN" ||
@@ -719,6 +759,7 @@ required_sections = {
         "last 30 days will be sent",
         "Cancel the alert",
         "exactly one POST",
+        "no second POST is queued while the first export remains in flight",
         "contains no credentials or unexpected health fields",
         "64 KiB encoded-body limit",
     ],

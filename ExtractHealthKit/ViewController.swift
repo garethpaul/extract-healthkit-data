@@ -28,6 +28,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     var tableData:[Steps] = []
     var outData:[Steps] = []
+    var exportInFlight = false
     var logoView: UIImageView!
     
     let basicCellIdentifier = "BasicCell"
@@ -180,6 +181,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     @IBAction func exportData(sender: AnyObject) {
+
+        if exportInFlight {
+            println("HealthKit export is already in progress.")
+            return
+        }
         
         var exportAlert = UIAlertController(title: "Export Data", message: "Step-count data from the last 30 days will be exported to the configured HTTPS endpoint.", preferredStyle: UIAlertControllerStyle.Alert)
         
@@ -198,7 +204,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
 
             // Construct HTTP Request
+            self.exportInFlight = true
             if !postRequest(json, completion: { succeeded in
+                self.exportInFlight = false
                 if succeeded {
                     println("HealthKit export completed.")
                 }
@@ -206,6 +214,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     println("HealthKit export failed.")
                 }
             }) {
+                self.exportInFlight = false
                 println("HealthKit export request was not queued.")
             }
             

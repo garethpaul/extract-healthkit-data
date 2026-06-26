@@ -79,6 +79,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - A queued export is reported as completed only after a transport-error-free HTTP 2xx response;
   failures use generic diagnostics without response bodies,
   endpoint details, payloads, or raw errors.
+- The controller owns only one in-flight HealthKit export at a time; repeated
+  confirmation attempts are rejected until completion or queue failure releases
+  that ownership.
 - HealthKit authorization and query failures use generic log messages instead
   of raw HealthKit error descriptions.
 - Completed HealthKit statistics are published to the table once, with both the

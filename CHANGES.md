@@ -1,5 +1,18 @@
 # Changes
 
+## 2026-06-26
+
+- **2026-06-26 10:41 PDT — Priority: privacy/correctness.** Added controller
+  ownership for one in-flight HealthKit export so repeated confirmations cannot
+  queue duplicate sensitive payloads before the first request completes.
+  Updated `ViewController.swift`, the static baseline, maintainer guidance,
+  manual device checklist, and completed plan. Five hostile mutations, all four
+  local aliases, and the external absolute-Makefile gate passed; the Linux host
+  lacks `swiftc` and Xcode, so executable policy and platform behavior remain
+  hosted macOS boundaries. Finding: transport cancellation was not the issue;
+  duplicate queue admission had no ownership state. Blockers: none. Next
+  action: publish the PR, verify hosted gates, and merge only the green SHA.
+
 ## 2026-06-18
 
 - Bounded the HealthKit statistics query itself to the exact 30-day sample

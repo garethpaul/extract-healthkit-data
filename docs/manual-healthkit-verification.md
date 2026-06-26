@@ -46,10 +46,12 @@ unredacted request bodies to an issue or pull request.
 2. Cancel the alert and verify that the controlled endpoint receives no request.
 3. Start export again, explicitly confirm, and verify exactly one POST reaches
    the controlled HTTPS endpoint.
-4. Verify the JSON contains only trimmed `date` and `value` fields from at most
+4. While the first response remains pending, attempt export again and verify no
+   second POST is queued while the first export remains in flight.
+5. Verify the JSON contains only trimmed `date` and `value` fields from at most
    30 inspected daily rows, contains no credentials or unexpected health fields,
    and remains within the documented 64 KiB encoded-body limit.
-5. Repeat with no valid rows and confirm no network request is sent.
+6. Repeat with no valid rows and confirm no network request is sent.
 
 ## Privacy And Failure Checks
 
