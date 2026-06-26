@@ -51,6 +51,8 @@ Helpful reports include:
   handling.
 - HealthKit export requests should disable cookie handling and declare Cache-Control: no-store
   before serialization and network handling.
+- Keep one in-flight HealthKit export per controller so repeated confirmation
+  cannot queue duplicate sensitive payloads before the first request completes.
 - The dedicated ephemeral HealthKit export session rejects HTTP redirects so
   endpoint validation cannot be bypassed after request dispatch.
 - A queued HealthKit export should report completion only after a
